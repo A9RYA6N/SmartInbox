@@ -40,7 +40,7 @@ def configure_logging() -> None:
     console_handler.setFormatter(formatter)
     console_handler.setLevel(level)
 
-    # ── File handler (rotating, 10 MB, keep 5 backups) ───────────────────────
+    #  File handler (rotating, 10 MB, keep 5 backups) 
     log_path = Path(settings.LOG_FILE)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     file_handler = logging.handlers.RotatingFileHandler(
@@ -49,7 +49,7 @@ def configure_logging() -> None:
     file_handler.setFormatter(formatter)
     file_handler.setLevel(level)
 
-    # ── Root logger ───────────────────────────────────────────────────────────
+    #  Root logger 
     root = logging.getLogger()
     root.setLevel(level)
     # Avoid adding duplicate handlers on reload
