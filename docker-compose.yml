@@ -1,0 +1,65 @@
+
+# ──────────────────────────────────────────────────────────────────────────────
+# SmartInbox – Docker Compose (Neon DB edition)
+#
+# NOTE: NO local PostgreSQL container.
+# The backend connects to Neon (serverless PostgreSQL) via DATABASE_URL.
+# Set DATABASE_URL in your .env file before running `docker-compose up`.
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+  # ── FastAPI Backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: smartinbox-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_NAME: "SmartInbox – SMS Spam Detection API"
+      APP_VERSION: "1.0.0"
+      DEBUG: "false"
+      ENVIRONMENT: "production"
+      # DATABASE_URL loaded from .env (points to Neon)
+      ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+      LOG_LEVEL: "INFO"
+      LOG_FILE: "logs/api.log"
+      MODEL_VERSION: "v2"
+      ADMIN_SETUP_KEY: "SmartInbox@Admin2026"
+      ALLOWED_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://localhost"]'
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+      # Mount ML artifacts so models persist across container restarts
+      - ./ml/models:/app/ml/models
+      - ./ml/artifacts:/app/ml/artifacts
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ── React Frontend ──────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: "/api/v1"
+    container_name: smartinbox-ui
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 15s
+      timeout: 5s
+      retries: 3

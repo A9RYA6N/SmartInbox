@@ -14,7 +14,7 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 && !window.location.pathname.includes("/login")) {
          localStorage.removeItem("authTokens");
-         // Instead of reloading, we'll let the app state handle it
+         window.location.href = "/login?expired=true";
     }
     return Promise.reject(error);
   }

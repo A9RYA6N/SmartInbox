@@ -1,0 +1,65 @@
+# ── Stage 1: Build ────────────────────────────────────────────────────────────
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+# System dependencies for ML + async postgres
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc g++ libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Download NLTK data during build (so runtime doesn't need internet)
+RUN python -c "import nltk; \
+    nltk.download('stopwords', quiet=True, download_dir='/root/nltk_data'); \
+    nltk.download('punkt', quiet=True, download_dir='/root/nltk_data'); \
+    nltk.download('punkt_tab', quiet=True, download_dir='/root/nltk_data'); \
+    nltk.download('wordnet', quiet=True, download_dir='/root/nltk_data')"
+
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
+FROM python:3.11-slim AS runtime
+
+WORKDIR /app
+
+# Runtime system deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /root/nltk_data /root/nltk_data
+
+# Copy backend source as /app/app/ (matches import structure in main.py)
+COPY Backend/ /app/app/
+
+# Copy ML artifacts (ml/ → /app/ml/)
+COPY ml/ /app/ml/
+
+# Copy seed script
+COPY seed.py /app/seed.py
+
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Create log directory
+RUN mkdir -p /app/logs
+
+# Environment
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV NLTK_DATA=/root/nltk_data
+
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=20s --timeout=10s --start-period=40s --retries=5 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+
+CMD ["/app/start.sh"]
