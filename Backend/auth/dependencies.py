@@ -5,6 +5,7 @@ FastAPI dependency functions for authentication and role-based access control.
 """
 
 from typing import Annotated
+import uuid
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -82,3 +83,16 @@ async def require_admin(current_user: CurrentUser) -> User:
 
 
 AdminUser = Annotated[User, Depends(require_admin)]
+
+
+# ── Public admin dependency (no auth — for admin panel UI only) ─────────────────
+
+class _PublicAdminUser:
+    """Dummy admin user returned by the public dependency. Write operations are still blocked."""
+    id = uuid.UUID("00000000-0000-0000-0000-000000000000")
+    username = "public_admin"
+    email = "admin@smartinbox.com"
+    role = UserRole.admin
+    is_active = True
+
+PublicAdminUser = Annotated[_PublicAdminUser, Depends(lambda: _PublicAdminUser())]
