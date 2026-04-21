@@ -77,11 +77,6 @@ export const getAdminUsers = async (page = 1, size = 20) => {
   return data;
 };
 
-export const getUserAnalyticsForAdmin = async (userId, days = 30) => {
-  const { data } = await axiosClient.get(`/admin/users/${userId}/analytics?days=${days}`);
-  return data;
-};
-
 export const toggleUserStatus = async (userId, isActive) => {
   const { data } = await axiosClient.patch(`/admin/users/${userId}`, { is_active: isActive });
   return data;
@@ -95,11 +90,6 @@ export const updateUserRole = async (userId, role) => {
 /** DELETE /admin/users/{id} – permanently delete user + all their data */
 export const deleteUser = async (userId) => {
   const { data } = await axiosClient.delete(`/admin/users/${userId}`);
-  return data;
-};
-
-export const sendAdminNotification = async (payload) => {
-  const { data } = await axiosClient.post("/admin/notifications", payload);
   return data;
 };
 
