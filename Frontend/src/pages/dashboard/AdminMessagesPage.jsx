@@ -95,10 +95,10 @@ export const AdminMessagesPage = () => {
           <div className="inline-flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase text-rose-400">
             <MessageSquare size={14} /> Packet Monitoring
           </div>
-          <h1 className="text-5xl font-black text-white tracking-tighter">
-            Global <span className="neon-text-purple">Intercepts</span>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter">
+            Global <span className="text-purple-600 font-semibold">Intercepts</span>
           </h1>
-          <p className="text-slate-400 max-w-xl font-medium">
+          <p className="text-slate-500 max-w-xl font-medium">
             Real-time monitoring of all neural classifications across the ecosystem.
           </p>
         </div>
@@ -107,14 +107,14 @@ export const AdminMessagesPage = () => {
           <button 
             onClick={handleExport}
             disabled={exporting}
-            className="btn-premium flex items-center gap-2 px-6 h-12 disabled:opacity-50"
+            className="btn-primary flex items-center gap-2 px-6 h-12 disabled:opacity-50"
           >
             {exporting ? <RefreshCw className="animate-spin w-4 h-4" /> : <Download size={18} />}
             <span className="text-xs font-black tracking-widest uppercase">Export CSV</span>
           </button>
           <button 
             onClick={() => fetchMessages()}
-            className="glass p-3 rounded-xl border-white/10 text-slate-400 hover:text-white transition-all"
+            className=" p-3 rounded-xl border-slate-200 text-slate-500 hover:text-slate-900 transition-all"
           >
             <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
           </button>
@@ -122,8 +122,8 @@ export const AdminMessagesPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-white/[0.02] p-6 rounded-3xl border border-white/5">
-        <div className="flex bg-white/5 rounded-2xl p-1 border border-white/5">
+      <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-white/[0.02] p-6 rounded-3xl border border-slate-100">
+        <div className="flex bg-slate-50 rounded-2xl p-1 border border-slate-100">
           {[
             { label: "All Packets", val: null },
             { label: "Spam Only", val: true },
@@ -132,7 +132,7 @@ export const AdminMessagesPage = () => {
             <button
               key={String(f.val)}
               onClick={() => { setFilter(f.val); setPage(1); }}
-              className={`px-6 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all duration-300 ${filter === f.val ? "bg-white/10 text-white shadow-lg" : "text-slate-500 hover:text-slate-300"}`}
+              className={`px-6 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all duration-300 ${filter === f.val ? "bg-slate-100 text-slate-900 shadow-lg" : "text-slate-500 hover:text-slate-600"}`}
             >
               {f.label}
             </button>
@@ -146,14 +146,14 @@ export const AdminMessagesPage = () => {
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && setSearch(searchInput)}
             placeholder="Filter by content..."
-            className="glass w-full pl-11 pr-4 h-12 rounded-xl border-white/10 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-all"
+            className=" w-full pl-11 pr-4 h-12 rounded-xl border-slate-200 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-all"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="glass rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-        <div className="grid grid-cols-12 gap-6 px-8 py-4 bg-white/5 border-b border-white/5 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
+      <div className=" rounded-3xl border border-slate-200 shadow-md overflow-hidden">
+        <div className="grid grid-cols-12 gap-6 px-8 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
           <div className="col-span-6">Payload Matrix</div>
           <div className="col-span-2 text-center">Entity Origin</div>
           <div className="col-span-2 text-center">Neural Confidence</div>
@@ -181,7 +181,7 @@ export const AdminMessagesPage = () => {
                         {item.is_spam ? <ShieldAlert size={20} /> : <ShieldCheck size={20} />}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-white truncate group-hover:text-cyan-400 transition-colors">
+                        <p className="text-sm font-bold text-slate-900 truncate group-hover:text-cyan-400 transition-colors">
                           "{item.message_text}"
                         </p>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-2 flex items-center gap-2">
@@ -194,14 +194,14 @@ export const AdminMessagesPage = () => {
                     <div className="col-span-2 flex flex-col items-center gap-1">
                       <div className="flex items-center gap-2">
                         <User size={12} className="text-slate-500" />
-                        <span className="text-xs font-bold text-white">{item.username}</span>
+                        <span className="text-xs font-bold text-slate-900">{item.username}</span>
                       </div>
                       <span className="text-[9px] font-bold text-slate-500 uppercase truncate max-w-full px-4">{item.user_email}</span>
                     </div>
 
                     <div className="col-span-2 flex flex-col items-center gap-2">
-                      <span className="text-sm font-black text-white">{(item.probability * 100).toFixed(0)}%</span>
-                      <div className="w-24 h-1 bg-white/5 rounded-full overflow-hidden">
+                      <span className="text-sm font-black text-slate-900">{(item.probability * 100).toFixed(0)}%</span>
+                      <div className="w-24 h-1 bg-slate-50 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${item.probability * 100}%` }}
@@ -213,7 +213,7 @@ export const AdminMessagesPage = () => {
                     <div className="col-span-2 flex justify-end">
                       <button 
                         onClick={() => handleDelete(item.prediction_id)}
-                        className="p-3 rounded-xl border border-white/5 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 transition-all opacity-0 group-hover:opacity-100"
+                        className="p-3 rounded-xl border border-slate-100 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 transition-all opacity-0 group-hover:opacity-100"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -226,7 +226,7 @@ export const AdminMessagesPage = () => {
         </div>
 
         {/* Pagination */}
-        <div className="p-6 bg-white/[0.02] border-t border-white/5 flex justify-between items-center">
+        <div className="p-6 bg-white/[0.02] border-t border-slate-100 flex justify-between items-center">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
             Page {page} of {data.pages}
           </p>
@@ -234,14 +234,14 @@ export const AdminMessagesPage = () => {
             <button 
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
-              className="p-2 glass border-white/10 rounded-xl disabled:opacity-30 hover:text-white transition-all"
+              className="p-2  border-slate-200 rounded-xl disabled:opacity-30 hover:text-slate-900 transition-all"
             >
               <ChevronLeft size={20} />
             </button>
             <button 
               disabled={page >= data.pages}
               onClick={() => setPage(page + 1)}
-              className="p-2 glass border-white/10 rounded-xl disabled:opacity-30 hover:text-white transition-all"
+              className="p-2  border-slate-200 rounded-xl disabled:opacity-30 hover:text-slate-900 transition-all"
             >
               <ChevronRight size={20} />
             </button>

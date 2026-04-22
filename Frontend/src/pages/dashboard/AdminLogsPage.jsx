@@ -62,10 +62,10 @@ export const AdminLogsPage = () => {
           <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase text-indigo-400">
             <ScrollText size={14} /> Audit Sequence
           </div>
-          <h1 className="text-5xl font-black text-white tracking-tighter">
-            System <span className="neon-text-blue">Chronicle</span>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter">
+            System <span className="text-blue-600 font-semibold">Chronicle</span>
           </h1>
-          <p className="text-slate-400 max-w-xl font-medium">
+          <p className="text-slate-500 max-w-xl font-medium">
             Immutable ledger of administrative interactions and neural system modifications.
           </p>
         </div>
@@ -93,14 +93,14 @@ export const AdminLogsPage = () => {
               a.click();
               toast.success("Audit logs exported.");
             }}
-            className="btn-premium flex items-center gap-2 px-6 h-12"
+            className="btn-primary flex items-center gap-2 px-6 h-12"
           >
             <Download size={18} />
             <span className="text-xs font-black tracking-widest uppercase">Export CSV</span>
           </button>
           <button 
             onClick={() => fetchLogs()}
-            className="glass p-3 rounded-xl border-white/10 text-slate-400 hover:text-white transition-all"
+            className=" p-3 rounded-xl border-slate-200 text-slate-500 hover:text-slate-900 transition-all"
           >
             <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
           </button>
@@ -108,8 +108,8 @@ export const AdminLogsPage = () => {
       </div>
 
       {/* Terminal Container */}
-      <div className="glass rounded-3xl border border-white/10 shadow-2xl overflow-hidden bg-black/40">
-        <div className="flex items-center justify-between px-8 py-4 bg-white/5 border-b border-white/5">
+      <div className=" rounded-3xl border border-slate-200 shadow-md overflow-hidden bg-black/40">
+        <div className="flex items-center justify-between px-8 py-4 bg-slate-50 border-b border-slate-100">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
               <Terminal size={12} /> nexus_audit_log_v2.bin
@@ -136,7 +136,7 @@ export const AdminLogsPage = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.02 }}
                       key={log.id}
-                      className="grid grid-cols-12 gap-4 px-4 py-2 hover:bg-white/5 rounded-lg transition-colors group text-[11px]"
+                      className="grid grid-cols-12 gap-4 px-4 py-2 hover:bg-slate-50 rounded-lg transition-colors group text-[11px]"
                     >
                       <div className="col-span-2 text-slate-600">
                         [{format(new Date(log.timestamp), "HH:mm:ss.SS")}]
@@ -146,7 +146,7 @@ export const AdminLogsPage = () => {
                           {actionCfg.label}
                         </span>
                       </div>
-                      <div className="col-span-3 text-slate-400 truncate">
+                      <div className="col-span-3 text-slate-500 truncate">
                         <span className="text-slate-600">USR:</span> {log.admin_email}
                       </div>
                       <div className="col-span-4 text-slate-500 italic truncate">
@@ -164,7 +164,7 @@ export const AdminLogsPage = () => {
         </div>
 
         {/* Footer Controls */}
-        <div className="px-8 py-4 bg-white/5 border-t border-white/5 flex justify-between items-center font-mono">
+        <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center font-mono">
           <div className="flex gap-4">
             <span className="text-[10px] text-slate-600 uppercase tracking-widest">Page {page}/{totalPages}</span>
             <span className="text-[10px] text-slate-600 uppercase tracking-widest">Entries: {total}</span>
@@ -173,14 +173,14 @@ export const AdminLogsPage = () => {
             <button 
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
-              className="text-slate-500 hover:text-white transition-colors disabled:opacity-30"
+              className="text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-30"
             >
               PREV_CHUNK
             </button>
             <button 
               disabled={page >= totalPages}
               onClick={() => setPage(page + 1)}
-              className="text-slate-500 hover:text-white transition-colors disabled:opacity-30"
+              className="text-slate-500 hover:text-slate-900 transition-colors disabled:opacity-30"
             >
               NEXT_CHUNK
             </button>
@@ -193,7 +193,7 @@ export const AdminLogsPage = () => {
         {Object.entries(ACTION_MAP).map(([key, cfg]) => (
           <div key={key} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest">
             <div className={`w-2 h-2 rounded-full bg-${cfg.color}-500`} />
-            <span className="text-slate-400">{cfg.label}</span>
+            <span className="text-slate-500">{cfg.label}</span>
           </div>
         ))}
       </div>

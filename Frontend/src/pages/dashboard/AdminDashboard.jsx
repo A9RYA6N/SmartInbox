@@ -51,7 +51,7 @@ import {
 const TabButton = ({ active, onClick, icon: Icon, label }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${active ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-lg shadow-cyan-500/5" : "text-slate-500 hover:text-slate-300 hover:bg-white/5"}`}
+    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${active ? "bg-slate-50 text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-100"}`}
   >
     <Icon size={16} />
     {label}
@@ -67,32 +67,32 @@ const ModelPanel = ({ modelInfo, importance, latency }) => {
     setIsUpdating(true);
     try {
       const data = await updateThreshold(globalThreshold);
-      toast.success(`Neural threshold synchronized: ${data.new_threshold.toFixed(4)}`);
+      toast.success(`Threshold updated: ${data.new_threshold.toFixed(4)}`);
     } catch {
-      toast.error("Threshold synchronization failed.");
+      toast.error("Threshold update failed.");
     } finally { setIsUpdating(false); }
   };
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Advanced Controls */}
-        <div className="lg:col-span-1 glass p-8 rounded-3xl border border-white/10 space-y-8">
-          <div className="space-y-2">
-            <h4 className="text-xl font-bold text-white flex items-center gap-2">
-              <Settings className="text-cyan-400" />
-              Core Configuration
+        <div className="lg:col-span-1 minimal-card p-6 space-y-6">
+          <div className="space-y-1">
+            <h4 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <Settings className="text-slate-500 w-5 h-5" />
+              Model Configuration
             </h4>
-            <p className="text-xs text-slate-500 font-medium">Manage neural engine parameters and active model selection.</p>
+            <p className="text-xs text-slate-500">Manage threshold and active model selection.</p>
           </div>
           
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Model</label>
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-600">Active Model</label>
               <select 
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 h-12 text-sm text-white focus:outline-none focus:border-cyan-500/50"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-100 transition-all"
               >
                 <option value="neural_vector_v1">NeuralVector v1.0 (Active)</option>
                 <option value="svm_optimized">SVM Optimized (Legacy)</option>
@@ -100,61 +100,63 @@ const ModelPanel = ({ modelInfo, importance, latency }) => {
               </select>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-white/5">
+            <div className="space-y-4 pt-4 border-t border-slate-100">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Neural Boundary</span>
-                <span className="text-lg font-black text-cyan-400 font-mono">{globalThreshold.toFixed(4)}</span>
+                <span className="text-xs font-medium text-slate-600">Decision Threshold</span>
+                <span className="text-sm font-semibold text-slate-900 font-mono">{globalThreshold.toFixed(4)}</span>
               </div>
               <input 
                 type="range" min="0.1" max="0.9" step="0.01" 
                 value={globalThreshold} 
                 onChange={(e) => setGlobalThreshold(parseFloat(e.target.value))}
-                className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-800"
               />
               <button 
                 onClick={handleUpdateThreshold}
                 disabled={isUpdating}
-                className="btn-premium w-full h-12 flex items-center justify-center gap-3 text-xs font-black tracking-widest uppercase disabled:opacity-50"
+                className="w-full py-2 bg-slate-50 text-slate-900 rounded-lg text-sm font-medium hover:bg-slate-100 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isUpdating ? <RefreshCw className="animate-spin w-4 h-4" /> : <ShieldCheck size={16} />}
-                Synchronize Neural State
+                Update Threshold
               </button>
             </div>
           </div>
         </div>
 
         {/* Feature Importance Graph */}
-        <div className="lg:col-span-2 glass p-8 rounded-3xl border border-white/10 space-y-6">
+        <div className="lg:col-span-2 minimal-card p-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h4 className="text-xl font-bold text-white flex items-center gap-2">
-              <TrendingUp className="text-purple-400" />
-              Vector Weighting Matrix
+            <h4 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+              <TrendingUp className="text-slate-500 w-5 h-5" />
+              Feature Importance
             </h4>
             <div className="flex gap-2">
-              <div className="w-2 h-2 rounded-full bg-purple-500" />
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
               <div className="w-2 h-2 rounded-full bg-cyan-500" />
             </div>
           </div>
-          <div className="h-[300px] w-full">
+          <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <ReBarChart data={importance.slice(0, 10)} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
+              <ReBarChart data={importance.slice(0, 10)} layout="vertical" margin={{ left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                 <XAxis type="number" hide />
                 <YAxis 
                   dataKey="feature" 
                   type="category" 
-                  stroke="rgba(255,255,255,0.3)" 
-                  fontSize={10} 
+                  stroke="#64748b" 
+                  fontSize={11} 
                   width={100}
+                  tickLine={false}
+                  axisLine={false}
                   tickFormatter={(val) => val.replace("feat_", "").replace(/_/g, " ")}
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
-                  itemStyle={{ color: "#22d3ee", fontSize: "12px", fontWeight: "bold" }}
+                  contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "12px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
+                  itemStyle={{ color: "#0f172a", fontWeight: 500 }}
                 />
-                <Bar dataKey="importance" radius={[0, 4, 4, 0]}>
+                <Bar dataKey="importance" radius={[0, 4, 4, 0]} barSize={20}>
                   {importance.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#8b5cf6" : "#06b6d4"} />
+                    <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#3b82f6" : "#0ea5e9"} />
                   ))}
                 </Bar>
               </ReBarChart>
@@ -240,7 +242,7 @@ export const AdminDashboard = () => {
           }
         }
       } catch {
-        toast.error("Command center uplink failed.");
+        toast.error("Dashboard data load failed.");
       } finally {
         setLoading(false);
       }
@@ -270,91 +272,84 @@ export const AdminDashboard = () => {
   }, [analyticsDays]);
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center h-96 gap-6">
-      <div className="w-12 h-12 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-      <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Synchronizing Nexus</p>
+    <div className="flex flex-col items-center justify-center h-64 gap-4">
+      <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+      <p className="text-sm font-medium text-slate-500">Loading Dashboard...</p>
     </div>
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-24">
+    <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase text-emerald-400">
-            <Server size={14} /> Systems Operational
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-md text-[10px] font-semibold uppercase text-emerald-700">
+            <Server size={12} /> Systems Operational
           </div>
-          <h1 className="text-5xl font-black text-white tracking-tighter">
-            Control <span className="neon-text-blue">Nexus</span>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            Control Panel
           </h1>
-          <p className="text-slate-400 max-w-xl font-medium">
-            Advanced oversight console for neural network optimization and global traffic monitoring.
+          <p className="text-slate-500 text-sm">
+            Overview of model performance, traffic, and platform entities.
           </p>
         </div>
 
-        <div className="flex items-center gap-3 bg-white/5 p-2 rounded-2xl border border-white/10">
-          <TabButton active={tab === "model"} onClick={() => setTab("model")} icon={Cpu} label="Neural Core" />
-          <TabButton active={tab === "analytics"} onClick={() => setTab("analytics")} icon={Activity} label="Telemetry" />
+        <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
+          <TabButton active={tab === "model"} onClick={() => setTab("model")} icon={Cpu} label="Model Overview" />
+          <TabButton active={tab === "analytics"} onClick={() => setTab("analytics")} icon={Activity} label="Analytics" />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar Quick Stats */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="glass p-6 rounded-3xl border border-white/10 space-y-6">
-            <h4 className="text-xs font-black text-white uppercase tracking-widest">System Health</h4>
-            <div className="space-y-6">
+          <div className="minimal-card p-6 space-y-5">
+            <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">System Health</h4>
+            <div className="space-y-4">
               {[
-                { label: "CPU Usage", val: sysHealth.cpu.toFixed(0), color: "cyan" },
-                { label: "Neural RAM", val: sysHealth.ram.toFixed(0), color: "purple" },
-                { label: "Storage", val: sysHealth.storage, color: "blue" },
+                { label: "CPU Usage", val: sysHealth.cpu.toFixed(0), color: "blue" },
+                { label: "Memory", val: sysHealth.ram.toFixed(0), color: "purple" },
+                { label: "Storage", val: sysHealth.storage, color: "slate" },
               ].map((s, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex justify-between text-[10px] font-bold">
-                    <span className="text-slate-500 uppercase">{s.label}</span>
-                    <span className="text-white">{s.val}%</span>
+                <div key={i} className="space-y-1.5">
+                  <div className="flex justify-between text-xs font-medium">
+                    <span className="text-slate-500">{s.label}</span>
+                    <span className="text-slate-900">{s.val}%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${s.val}%` }}
-                      className={`h-full bg-${s.color}-500 shadow-[0_0_8px_currentColor]`}
+                      className={`h-full bg-${s.color}-500 rounded-full`}
                     />
                   </div>
                 </div>
               ))}
             </div>
-            <div className="pt-4 border-t border-white/5">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                All Nodes Synchronized
-              </div>
-            </div>
           </div>
 
-          <div className="glass p-6 rounded-3xl border border-white/10 space-y-6">
+          <div className="minimal-card p-6 space-y-5">
             <div className="flex justify-between items-center">
-              <h4 className="text-xs font-black text-white uppercase tracking-widest">Recent Threats</h4>
+              <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">Recent Threats</h4>
               <div className="flex gap-1">
-                <div className="w-1 h-1 rounded-full bg-rose-500 animate-pulse" />
-                <div className="w-1 h-1 rounded-full bg-rose-500/50 animate-pulse delay-75" />
+                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
               </div>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentThreats.length > 0 ? recentThreats.map((threat, i) => (
-                <div key={i} className="flex gap-4 group">
-                  <div className="w-1 h-12 bg-rose-500 rounded-full group-hover:scale-y-125 transition-transform" />
+                <div key={i} className="flex gap-3">
+                  <div className="w-1 h-auto bg-rose-500 rounded-full flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] text-white font-bold truncate">
+                    <p className="text-xs text-slate-800 font-medium truncate">
                       {threat.message_text}
                     </p>
-                    <p className="text-[9px] text-slate-500">
+                    <p className="text-[10px] text-slate-500 mt-0.5">
                       {new Date(threat.predicted_at).toLocaleTimeString()}
                     </p>
                   </div>
                 </div>
               )) : (
-                <p className="text-[11px] text-slate-500">No recent threats detected.</p>
+                <p className="text-xs text-slate-500">No recent threats detected.</p>
               )}
             </div>
           </div>
@@ -365,87 +360,74 @@ export const AdminDashboard = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={tab}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
             >
               {tab === "model" && <ModelPanel modelInfo={modelInfo} importance={importance} latency={latency} />}
               
               {tab === "analytics" && (
-                <div className="space-y-8">
-                  <div className="glass p-8 rounded-3xl border border-white/10 space-y-8">
+                <div className="space-y-6">
+                  <div className="minimal-card p-6 space-y-6">
                     <div className="flex justify-between items-end">
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                            <Network className="text-cyan-400" />
-                            Global Traffic Throughput
-                          </h4>
-                          <p className="text-xs text-slate-500 font-medium mt-1">Real-time classification density across all nodes.</p>
-                        </div>
-                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/5 w-fit">
-                          {[
-                            { l: '7D', v: 7 },
-                            { l: '14D', v: 14 },
-                            { l: '1M', v: 30 },
-                            { l: '1Y', v: 365 }
-                          ].map(t => (
-                            <button
-                              key={t.v}
-                              onClick={() => setAnalyticsDays(t.v)}
-                              className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
-                                analyticsDays === t.v 
-                                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20' 
-                                  : 'text-slate-500 hover:text-white'
-                              }`}
-                            >
-                              {t.l}
-                            </button>
-                          ))}
-                        </div>
+                      <div className="space-y-1">
+                        <h4 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                          <Network className="text-slate-500 w-5 h-5" />
+                          Traffic Analytics
+                        </h4>
+                        <p className="text-xs text-slate-500">Classification volume across all users.</p>
                       </div>
-                      <div className="flex gap-4 mb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-cyan-500" />
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Traffic</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-rose-500" />
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Detected Threats</span>
-                        </div>
+                      <div className="flex bg-slate-100 p-1 rounded-md">
+                        {[
+                          { l: '7D', v: 7 },
+                          { l: '14D', v: 14 },
+                          { l: '1M', v: 30 }
+                        ].map(t => (
+                          <button
+                            key={t.v}
+                            onClick={() => setAnalyticsDays(t.v)}
+                            className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                              analyticsDays === t.v 
+                                ? 'bg-white text-slate-900 shadow-sm' 
+                                : 'text-slate-500 hover:text-slate-700'
+                            }`}
+                          >
+                            {t.l}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                    <div className="h-[400px] w-full">
+                    <div className="h-[300px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={trafficData}>
+                        <AreaChart data={trafficData} margin={{ left: -20 }}>
                           <defs>
                             <linearGradient id="colorTraffic" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#22d3ee" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                             </linearGradient>
                             <linearGradient id="colorThreats" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.2}/>
+                              <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.1}/>
                               <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                          <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} axisLine={false} />
-                          <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} axisLine={false} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                          <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} />
+                          <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} />
                           <Tooltip 
-                            contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "16px" }}
+                            contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "12px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
                           />
-                          <Area type="monotone" dataKey="traffic" stroke="#22d3ee" fillOpacity={1} fill="url(#colorTraffic)" strokeWidth={3} />
-                          <Area type="monotone" dataKey="threats" stroke="#f43f5e" fillOpacity={1} fill="url(#colorThreats)" strokeWidth={3} />
+                          <Area type="monotone" dataKey="traffic" stroke="#3b82f6" fillOpacity={1} fill="url(#colorTraffic)" strokeWidth={2} />
+                          <Area type="monotone" dataKey="threats" stroke="#f43f5e" fillOpacity={1} fill="url(#colorThreats)" strokeWidth={2} />
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="glass p-8 rounded-3xl border border-white/10 space-y-6">
-                      <h4 className="text-lg font-bold text-white flex items-center gap-2">
-                        <Users className="text-blue-400" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="minimal-card p-6 space-y-6">
+                      <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                        <Users className="text-slate-500 w-4 h-4" />
                         Platform Entities
                       </h4>
                       <div className="space-y-4">
@@ -455,118 +437,71 @@ export const AdminDashboard = () => {
                           { label: "Spam Intercepts", count: quickStats?.spam_count || 0, pct: quickStats?.total_messages ? ((quickStats?.spam_count || 0)/(quickStats?.total_messages || 1))*100 : 0, color: "rose" },
                           { label: "Clean Transmissions", count: quickStats?.ham_count || 0, pct: quickStats?.total_messages ? ((quickStats?.ham_count || 0)/(quickStats?.total_messages || 1))*100 : 0, color: "blue" },
                         ].map((g, i) => (
-                          <div key={i} className="space-y-2">
-                            <div className="flex justify-between text-xs font-bold">
-                              <span className="text-white">{g.label}</span>
-                              <span className="text-slate-500">{g.count.toLocaleString()}</span>
+                          <div key={i} className="space-y-1.5">
+                            <div className="flex justify-between text-xs font-medium">
+                              <span className="text-slate-600">{g.label}</span>
+                              <span className="text-slate-900">{g.count.toLocaleString()}</span>
                             </div>
-                            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                              <div className={`h-full bg-${g.color}-500`} style={{ width: `${g.pct}%` }} />
+                            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div className={`h-full bg-${g.color}-500 rounded-full`} style={{ width: `${g.pct}%` }} />
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="glass p-8 rounded-3xl border border-white/10 space-y-6">
+                    <div className="minimal-card p-6 space-y-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                            <Users className="text-purple-400" />
-                            Entity Vulnerability Index
+                          <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                            <AlertTriangle className="text-slate-500 w-4 h-4" />
+                            Most Vulnerable Target
                           </h4>
-                          <p className="text-xs text-slate-500 font-medium mt-1">Top nodes prone to targeted spam campaigns.</p>
+                          <p className="text-xs text-slate-500 mt-1">User receiving most spam.</p>
                         </div>
-                        {topTarget && (
-                          <div className="bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-2xl text-center">
-                            <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest">Primary Target</p>
-                            <p className="text-sm font-black text-white">{topTarget.name}</p>
-                          </div>
-                        )}
                       </div>
 
-                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                        <div className="xl:col-span-2 h-[350px] w-full">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <ReBarChart data={userDistribution} layout="vertical" margin={{ left: 10, right: 30 }}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-                              <XAxis type="number" hide />
-                              <YAxis 
-                                dataKey="name" 
-                                type="category" 
-                                axisLine={false} 
-                                tickLine={false} 
-                                width={100}
-                                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
-                              />
-                              <Tooltip 
-                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                content={({ active, payload, label }) => {
-                                  if (active && payload && payload.length) {
-                                    return (
-                                      <div className="glass p-4 border-white/10 rounded-2xl shadow-2xl">
-                                        <p className="text-sm font-black text-white mb-2">{label}</p>
-                                        <div className="space-y-1">
-                                          <div className="flex justify-between gap-8">
-                                            <span className="text-[10px] font-bold text-rose-400 uppercase">Spam</span>
-                                            <span className="text-[10px] font-black text-white">{payload[0].value}</span>
-                                          </div>
-                                          <div className="flex justify-between gap-8">
-                                            <span className="text-[10px] font-bold text-blue-400 uppercase">Ham</span>
-                                            <span className="text-[10px] font-black text-white">{payload[1].value}</span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    );
-                                  }
-                                  return null;
-                                }}
-                              />
-                              <Bar dataKey="spam" fill="#f43f5e" radius={[0, 4, 4, 0]} stackId="a" barSize={16} />
-                              <Bar dataKey="ham" fill="#3b82f6" radius={[0, 4, 4, 0]} stackId="a" barSize={16} />
-                            </ReBarChart>
-                          </ResponsiveContainer>
-                        </div>
-
-                        {topTarget && (
-                          <div className="flex flex-col items-center justify-center p-6 bg-white/5 rounded-3xl border border-white/5">
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Target Profile: {topTarget.name}</p>
-                            <div className="h-[200px] w-full">
-                              <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                  <Pie
-                                    data={[
-                                      { name: 'Spam', value: topTarget.spam, color: '#f43f5e' },
-                                      { name: 'Ham', value: topTarget.ham, color: '#3b82f6' }
-                                    ]}
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                  >
-                                    {[0, 1].map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={index === 0 ? '#f43f5e' : '#3b82f6'} />
-                                    ))}
-                                  </Pie>
-                                  <Tooltip 
-                                    contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
-                                  />
-                                </PieChart>
-                              </ResponsiveContainer>
-                            </div>
-                            <div className="text-center mt-4">
-                              <h5 className="text-2xl font-black text-white">{((topTarget.spam / (topTarget.total || 1)) * 100).toFixed(1)}%</h5>
-                              <p className="text-[9px] font-bold text-rose-500 uppercase tracking-widest">Spam Saturation</p>
-                            </div>
+                      {topTarget ? (
+                        <div className="flex flex-col items-center justify-center p-4 bg-slate-50 rounded-xl border border-slate-100 h-[220px]">
+                          <p className="text-xs font-semibold text-slate-700 mb-2">{topTarget.name}</p>
+                          <div className="h-[120px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie
+                                  data={[
+                                    { name: 'Spam', value: topTarget.spam, color: '#f43f5e' },
+                                    { name: 'Clean', value: topTarget.ham, color: '#3b82f6' }
+                                  ]}
+                                  innerRadius={35}
+                                  outerRadius={50}
+                                  paddingAngle={2}
+                                  dataKey="value"
+                                >
+                                  {[0, 1].map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={index === 0 ? '#f43f5e' : '#3b82f6'} />
+                                  ))}
+                                </Pie>
+                                <Tooltip 
+                                  contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
                           </div>
-                        )}
-                      </div>
+                          <div className="text-center mt-2">
+                            <h5 className="text-lg font-bold text-slate-900">{((topTarget.spam / (topTarget.total || 1)) * 100).toFixed(1)}%</h5>
+                            <p className="text-[10px] font-medium text-slate-500 uppercase">Spam Ratio</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-[220px] text-slate-500">
+                          <Users className="w-8 h-8 mb-2 opacity-50" />
+                          <span className="text-sm">No data available</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
-
-
             </motion.div>
           </AnimatePresence>
         </div>
