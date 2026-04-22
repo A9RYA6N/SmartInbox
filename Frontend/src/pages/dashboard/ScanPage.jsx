@@ -1,7 +1,8 @@
-import { useState, useCallback, memo } from "react";
-import { FileText, ShieldCheck, Zap, Lock, Search, Cpu, ArrowRight, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FileText, ShieldCheck, Zap, Lock, ChevronRight, Search, Cpu, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { predictText } from "../../api/spamApi";
+import { predictText, getJobStatus } from "../../api/spamApi";
 import { toast } from "react-hot-toast";
 
 const FEATURES = [
@@ -23,21 +24,17 @@ const FeatureCard = memo(({ icon: Icon, title, desc }) => (
 export const ScanPage = () => {
   const [text, setText] = useState("");
   const [isPredicting, setIsPredicting] = useState(false);
+  const [jobId, setJobId] = useState(null);
   const navigate = useNavigate();
 
   const handlePredict = useCallback(async () => {
     if (!text.trim()) return;
     setIsPredicting(true);
     try {
-      const data = await predictText(text);
-      // Dispatch event so NotificationBell refreshes if a spam is detected
-      if (data.is_spam) {
-        window.dispatchEvent(new Event("notification:new"));
-      }
-      navigate("/results", { state: { result: data } });
+      const { job_id } = await predictText(text);
+      setJobId(job_id);
     } catch (err) {
-      toast.error(err.response?.data?.detail || "Analysis failed. Please try again.");
-    } finally {
+      toast.error(err.response?.data?.detail || "Analysis failed.");
       setIsPredicting(false);
     }
   }, [text, navigate]);
@@ -46,27 +43,49 @@ export const ScanPage = () => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handlePredict();
   }, [handlePredict]);
 
+  useEffect(() => {
+    if (!jobId) return;
+
+    let pollInterval = setInterval(async () => {
+      try {
+        const job = await getJobStatus(jobId);
+        if (job.status === "completed") {
+          clearInterval(pollInterval);
+          navigate("/results", { state: { result: job.result } });
+        } else if (job.status === "failed") {
+          clearInterval(pollInterval);
+          toast.error(job.error || "Neural processing failed.");
+          setIsPredicting(false);
+          setJobId(null);
+        }
+      } catch (err) {
+        clearInterval(pollInterval);
+        setIsPredicting(false);
+      }
+    }, 1000);
+
+    return () => clearInterval(pollInterval);
+  }, [jobId, navigate]);
+
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto space-y-8 animate-in">
       {/* Header */}
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 badge-blue">
-          <Search size={11} /> Message Scanner
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-bold uppercase tracking-widest border border-indigo-100">
+          <Search size={12} /> Neural Gateway
         </div>
-        <h1 className="text-2xl font-semibold text-slate-900">Scan a Message</h1>
-        <p className="text-slate-500 text-sm leading-relaxed">
-          Paste any SMS or message below. Our ML model will classify it instantly with probability scoring.
-        </p>
+        <h1 className="text-4xl font-black text-slate-900 tracking-tight">Instant Analysis</h1>
+        <p className="text-sm text-slate-500 font-medium">Input suspicious content for real-time neural classification.</p>
       </div>
 
-      {/* Input card */}
-      <div className="card p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-slate-100 rounded-lg">
-              <FileText size={14} className="text-slate-500" />
-            </div>
-            <span className="text-xs font-medium text-slate-600 uppercase tracking-wide">Message Input</span>
+      {/* Input Section */}
+      <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <FileText size={14} /> Payload Stream
+          </div>
+          <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+            {text.length} / 1000
           </div>
           <span className="text-xs text-slate-400 tabular-nums">{text.length} / 1000</span>
         </div>
@@ -74,55 +93,51 @@ export const ScanPage = () => {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Paste the message you want to analyse here…"
+          placeholder="Paste message content here..."
           maxLength={1000}
-          className="w-full h-52 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-900
-                     placeholder:text-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2
-                     focus:ring-blue-50 transition-all resize-none leading-relaxed"
+          className="w-full h-64 bg-slate-50 border border-slate-200 rounded-2xl p-6 text-lg text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-indigo-500/50 transition-all resize-none font-medium"
         />
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 text-slate-400">
-            <Lock size={13} />
-            <span className="text-xs">Messages are not stored after analysis</span>
+            <Lock size={14} />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Encrypted</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 hidden sm:block">⌘ + Enter to scan</span>
-            <button
-              onClick={handlePredict}
-              disabled={!text.trim() || isPredicting}
-              className="btn-primary px-6 h-10 min-w-[140px]"
-            >
-              {isPredicting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Analysing…
-                </>
-              ) : (
-                <>
-                  <Zap size={15} />
-                  Scan Message
-                  <ArrowRight size={14} />
-                </>
-              )}
-            </button>
-          </div>
+          
+          <button
+            onClick={handlePredict}
+            disabled={!text.trim() || isPredicting}
+            className="btn-premium flex items-center justify-center gap-3 px-10 h-12 w-full sm:w-auto disabled:opacity-50"
+          >
+            {isPredicting ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                <span className="text-[10px] font-bold tracking-widest uppercase">Start Analysis</span>
+                <ChevronRight size={16} />
+              </>
+            )}
+          </button>
         </div>
-
-        {/* Skeleton preview while predicting */}
-        {isPredicting && (
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <div className="skeleton h-3 w-1/3 rounded" />
-            <div className="skeleton h-3 w-2/3 rounded" />
-            <div className="skeleton h-3 w-1/2 rounded" />
-          </div>
-        )}
       </div>
 
-      {/* Feature grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {FEATURES.map((f) => <FeatureCard key={f.title} {...f} />)}
+      {/* Features */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { icon: Cpu, title: "Neural Core", desc: "RandomForest pipeline trained on 2M+ message vectors.", color: "indigo" },
+          { icon: ShieldCheck, title: "Precision", desc: "Char-level analysis for defanging phishing hooks.", color: "emerald" },
+          { icon: Zap, title: "Latency", desc: "Sub-100ms inference via optimized FastAPI backend.", color: "rose" }
+        ].map((feature, i) => (
+          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div className={`p-2.5 rounded-xl bg-${feature.color}-50 text-${feature.color}-600 border border-${feature.color}-100 w-fit mb-4`}>
+              <feature.icon size={16} />
+            </div>
+            <h4 className="text-sm font-bold text-slate-900 mb-1">{feature.title}</h4>
+            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">
+              {feature.desc}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );

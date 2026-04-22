@@ -31,6 +31,7 @@ import {
   getUserAnalyticsForAdmin,
   sendAdminNotification 
 } from "../../api/adminApi";
+import { useStore } from "../../store/useStore";
 import { toast } from "react-hot-toast";
 
 export const AdminUsersPage = () => {
@@ -157,6 +158,8 @@ export const AdminUsersPage = () => {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  const currentUser = useStore((state) => state.user);
+
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-24">
       {/* Header */}
@@ -223,7 +226,10 @@ export const AdminUsersPage = () => {
                         {u.username?.[0]?.toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-slate-800 truncate">{u.username}</p>
+                        <p className="text-sm font-bold text-slate-800 truncate">
+                          {u.username}
+                          {u.id === currentUser?.id && <span className="ml-2 text-[8px] px-1.5 py-0.5 bg-slate-900 text-white rounded">YOU</span>}
+                        </p>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 flex items-center gap-2">
                           <Mail size={10} /> {u.email}
                         </p>
@@ -251,7 +257,7 @@ export const AdminUsersPage = () => {
                       <div className="w-32 h-1 bg-slate-100 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-indigo-500" 
-                          style={{ width: `${Math.min(100, ((u.prediction_count || 0) / 100) * 100)}%` }} 
+                          style={{ width: `${Math.min(100, ((u.prediction_count || 0) / (u.prediction_count || 1)) * 100)}%` }} 
                         />
                       </div>
                     </div>
@@ -289,19 +295,26 @@ export const AdminUsersPage = () => {
                       </button>
                       <button 
                         onClick={() => handleToggle(u.id, u.is_active)}
-                        className={`p-2 rounded-xl border border-slate-100 transition-all ${u.is_active ? "text-rose-500 hover:bg-rose-50" : "text-emerald-500 hover:bg-emerald-50"}`}
+                        disabled={u.id === currentUser?.id}
+                        className={`p-2 rounded-xl border border-slate-100 transition-all ${u.id === currentUser?.id ? "opacity-20 cursor-not-allowed" : u.is_active ? "text-rose-500 hover:bg-rose-50" : "text-emerald-500 hover:bg-emerald-50"}`}
                       >
                         {u.is_active ? <UserX size={16} /> : <UserCheck size={16} />}
                       </button>
                       <button 
                         onClick={() => setConfirmDelete(u)}
-                        className="p-2 rounded-xl border border-slate-100 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                        disabled={u.id === currentUser?.id}
+                        className={`p-2 rounded-xl border border-slate-100 text-slate-400 transition-all ${u.id === currentUser?.id ? "opacity-20 cursor-not-allowed" : "hover:text-rose-600 hover:bg-rose-50"}`}
                       >
                         <Trash2 size={16} />
                       </button>
                     </div>
                   </motion.div>
                 ))}
+              </div>
+            ) : (
+              <div className="h-[400px] flex flex-col items-center justify-center text-slate-400 space-y-4">
+                <Users size={48} className="opacity-20" />
+                <p className="text-sm font-medium tracking-tight">No entities found in this sector.</p>
               </div>
             )}
           </AnimatePresence>
