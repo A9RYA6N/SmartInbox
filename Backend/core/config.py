@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     PORT: int  = 8000
 
     DATABASE_URL: str = (
-        "postgresql+asyncpg://postgres:password@localhost:5432/smartinbox"
+        "sqlite+aiosqlite:///./smartinbox.db"
     )
 
     SECRET_KEY: str       = "CHANGE_ME_IN_PRODUCTION_USE_32_CHAR_RANDOM_STRING"
