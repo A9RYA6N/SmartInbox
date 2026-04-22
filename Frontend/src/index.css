@@ -31,6 +31,16 @@
 }
 
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased;
     font-family: var(--font-sans);
@@ -39,6 +49,16 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     @apply font-black tracking-tight;
+  }
+
+  h1 { @apply text-3xl font-semibold text-slate-900 tracking-tight; }
+  h2 { @apply text-xl font-semibold text-slate-800; }
+  h3 { @apply text-base font-semibold text-slate-800; }
+  h4 { @apply text-sm font-semibold text-slate-700; }
+
+  ::selection {
+    background-color: #DBEAFE;
+    color: #1E40AF;
   }
 }
 

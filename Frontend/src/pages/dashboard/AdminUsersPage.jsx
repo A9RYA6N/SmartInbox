@@ -368,7 +368,7 @@ export const AdminUsersPage = () => {
                 </button>
                 <button 
                   onClick={() => handleDelete(confirmDelete)}
-                  className="flex-1 h-12 bg-rose-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/20 hover:bg-rose-600"
+                  className="flex-1 h-12 bg-rose-500 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg  hover:bg-rose-600"
                 >
                   Purge Entity
                 </button>
@@ -530,7 +530,7 @@ export const AdminUsersPage = () => {
                   <input 
                     value={notifContent.title}
                     onChange={(e) => setNotifContent({...notifContent, title: e.target.value})}
-                    className="input-premium w-full h-12 text-sm"
+                    className="input-base w-full h-12 text-sm"
                     placeholder="Security Breach Detected"
                   />
                 </div>
@@ -539,7 +539,7 @@ export const AdminUsersPage = () => {
                   <textarea 
                     value={notifContent.message}
                     onChange={(e) => setNotifContent({...notifContent, message: e.target.value})}
-                    className="input-premium w-full h-32 text-sm p-4 resize-none"
+                    className="input-base w-full h-32 text-sm p-4 resize-none"
                     placeholder="Enter warning details..."
                   />
                 </div>
@@ -554,7 +554,7 @@ export const AdminUsersPage = () => {
                   <button 
                     type="submit"
                     disabled={sendingNotif}
-                    className="flex-1 h-12 bg-rose-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/20 hover:bg-rose-600 flex items-center justify-center gap-2"
+                    className="flex-1 h-12 bg-rose-500 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg  hover:bg-rose-600 flex items-center justify-center gap-2"
                   >
                     {sendingNotif ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -31,7 +31,7 @@ const VerdictBadge = ({ verdict }) => {
     SPAM:      { cls: "bg-rose-500/10 text-rose-400 border-rose-500/20",    icon: ShieldAlert,  label: "SPAM"      },
     HAM:       { cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", icon: ShieldCheck,  label: "HAM"  },
     UNCERTAIN: { cls: "bg-amber-500/10 text-amber-400 border-amber-500/20", icon: HelpCircle,   label: "UNCERTAIN" },
-  }[verdict] || { cls: "bg-slate-500/10 text-slate-400 border-slate-500/20", icon: HelpCircle, label: verdict };
+  }[verdict] || { cls: "bg-slate-500/10 text-slate-500 border-slate-500/20", icon: HelpCircle, label: verdict };
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black tracking-widest border ${cfg.cls}`}>
@@ -117,17 +117,17 @@ export const BatchUploadPage = () => {
           <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase text-amber-400">
             <Layers size={14} /> Batch Processing
           </div>
-          <h1 className="text-5xl font-black text-white tracking-tighter">
-            Intelligence <span className="neon-text-blue">Ingestion</span>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter">
+            Intelligence <span className="text-blue-600 font-semibold">Ingestion</span>
           </h1>
-          <p className="text-slate-400 max-w-xl font-medium">
+          <p className="text-slate-500 max-w-xl font-medium">
             Upload large datasets for automated neural classification and deep threat analysis.
           </p>
         </div>
       </div>
 
       {!results ? (
-        <div className="glass rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+        <div className=" rounded-3xl border border-slate-200 shadow-md overflow-hidden">
           <div
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
@@ -137,19 +137,19 @@ export const BatchUploadPage = () => {
           >
             <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])} />
             
-            <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mb-8 transition-all duration-500 ${file ? "bg-emerald-500/20 scale-110" : "bg-white/5"}`}>
+            <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mb-8 transition-all duration-500 ${file ? "bg-emerald-500/20 scale-110" : "bg-slate-50"}`}>
               {file ? <CheckCircle size={40} className="text-emerald-400" /> : <Upload size={40} className="text-slate-500" />}
             </div>
 
             {file ? (
               <div className="text-center space-y-2">
-                <h3 className="text-2xl font-black text-white tracking-tight">{file.name}</h3>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{file.name}</h3>
                 <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">{(file.size / 1024).toFixed(1)} KB • READY FOR INGESTION</p>
                 <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="text-rose-400 hover:text-rose-300 transition-colors text-xs font-black uppercase tracking-widest pt-4">Remove File</button>
               </div>
             ) : (
               <div className="text-center space-y-4">
-                <h3 className="text-2xl font-black text-white tracking-tight">Drop Intelligence Matrix</h3>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Drop Intelligence Matrix</h3>
                 <p className="text-slate-500 font-medium">Drag & drop CSV or click to browse filesystem</p>
                 <div className="flex gap-4 justify-center pt-4">
                   <div className="flex items-center gap-2 text-[10px] font-black text-slate-600 uppercase tracking-widest">
@@ -166,13 +166,13 @@ export const BatchUploadPage = () => {
           </div>
 
           {file && !fileError && (
-            <div className="p-8 bg-white/5 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="p-8 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
                   <RefreshCw className={`text-cyan-400 ${isProcessing ? "animate-spin" : ""}`} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-white uppercase tracking-tight">Neural pipeline standby</p>
+                  <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">Neural pipeline standby</p>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Ready to process {file.name}</p>
                 </div>
               </div>
@@ -181,7 +181,7 @@ export const BatchUploadPage = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleProcess} 
                 disabled={isProcessing} 
-                className="btn-premium flex items-center gap-3 px-12 h-14 w-full sm:w-auto disabled:opacity-50"
+                className="btn-primary flex items-center gap-3 px-12 h-14 w-full sm:w-auto disabled:opacity-50"
               >
                 {isProcessing ? (
                   <>
@@ -208,22 +208,22 @@ export const BatchUploadPage = () => {
               { label: "Uncertain", value: results.uncertain_count, color: "amber" },
               { label: "Processing Errors", value: results.errors, color: "rose" }
             ].map((s, i) => (
-              <div key={i} className="glass-card p-6">
+              <div key={i} className="minimal-card p-6">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{s.label}</p>
                 <p className={`text-3xl font-black text-${s.color}-400 mt-1 tracking-tight`}>{s.value}</p>
               </div>
             ))}
           </div>
 
-          <div className="glass rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
-              <h3 className="text-xl font-bold text-white">Ingestion Results</h3>
+          <div className=" rounded-3xl border border-slate-200 shadow-md overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h3 className="text-xl font-bold text-slate-900">Ingestion Results</h3>
               <div className="flex gap-3">
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={downloadResultsCSV} 
-                  className="glass border-white/10 px-6 h-10 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:text-white transition-all"
+                  className=" border-slate-200 px-6 h-10 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:text-slate-900 transition-all"
                 >
                   <Download size={16} /> Export Results
                 </motion.button>
@@ -231,7 +231,7 @@ export const BatchUploadPage = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => navigate("/history")} 
-                  className="glass border-white/10 px-6 h-10 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:text-white transition-all"
+                  className=" border-slate-200 px-6 h-10 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:text-slate-900 transition-all"
                 >
                   <History size={16} /> View Full History
                 </motion.button>
@@ -239,7 +239,7 @@ export const BatchUploadPage = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setResults(null)} 
-                  className="btn-premium px-6 h-10 text-xs font-black uppercase tracking-widest"
+                  className="btn-primary px-6 h-10 text-xs font-black uppercase tracking-widest"
                 >
                   New Ingestion
                 </motion.button>
@@ -251,7 +251,7 @@ export const BatchUploadPage = () => {
                 <div key={row.row} className="grid grid-cols-12 gap-6 px-8 py-6 items-center hover:bg-white/[0.02] transition-colors group">
                   <div className="col-span-1 text-[10px] font-black text-slate-600 uppercase tracking-widest">#{row.row}</div>
                   <div className="col-span-7">
-                    <p className="text-sm font-bold text-white truncate group-hover:text-cyan-400 transition-colors leading-relaxed">"{row.message}"</p>
+                    <p className="text-sm font-bold text-slate-900 truncate group-hover:text-cyan-400 transition-colors leading-relaxed">"{row.message}"</p>
                   </div>
                   <div className="col-span-4 flex justify-end">
                     {row.error ? (
