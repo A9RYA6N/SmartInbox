@@ -77,7 +77,7 @@ export const Sidebar = () => {
       className="relative h-screen bg-white border-r border-slate-200 flex flex-col transition-all z-50 shrink-0"
     >
       {/* Logo Section */}
-      <div className="p-6 flex items-center justify-between">
+      <div className="p-5 flex items-center justify-between border-b border-slate-100">
         <AnimatePresence>
           {!collapsed && (
             <motion.div

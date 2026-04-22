@@ -201,7 +201,7 @@ class RobustSMSFeaturePipeline:
 def load_and_preprocess(path: str) -> pd.DataFrame:
     """Load CSV and apply all preprocessing steps."""
     logger.info("Loading dataset from %s", path)
-    df = pd.read_csv(path, encoding="latin-1")
+    df = pd.read_csv(path, encoding="utf-8")
 
     # Normalise column names
     df.columns = [c.strip().lower() for c in df.columns]

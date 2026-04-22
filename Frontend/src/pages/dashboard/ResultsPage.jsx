@@ -17,11 +17,31 @@ export const ResultsPage = () => {
   const navigate = useNavigate();
   const result = location.state?.result;
 
-  if (!result) {
-    return <Navigate to="/scan" replace />;
-  }
+  if (!result) return <Navigate to="/scan" replace />;
 
   const isSpam = result.prediction === 1;
+  const probPct = (result.probability * 100).toFixed(1);
+  const confPct = result.confidence !== undefined ? (result.confidence * 100).toFixed(0) : null;
+
+  const handleDownload = () => {
+    const rows = [
+      ["Message", "Verdict", "Probability (%)", "Model", "Timestamp"],
+      [
+        `"${(result.text || "").replace(/"/g, '""')}"`,
+        isSpam ? "SPAM" : "HAM",
+        probPct,
+        result.model_version || "v3",
+        new Date().toISOString(),
+      ],
+    ];
+    const csv = rows.map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement("a"), { href: url, download: `smartinbox_${Date.now()}.csv` });
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Report downloaded.");
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in">
@@ -96,7 +116,9 @@ export const ResultsPage = () => {
               <div className={`inline-flex items-center gap-2 px-4 py-1 rounded-full border ${isSpam ? "bg-rose-50 border-rose-100 text-rose-600" : "bg-emerald-50 border-emerald-100 text-emerald-600"} text-[9px] font-black uppercase tracking-widest`}>
                 {isSpam ? "Dangerous" : "Secure"}
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
             <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
               <div className="text-center">
@@ -110,6 +132,7 @@ export const ResultsPage = () => {
             </div>
           </div>
         </div>
+      </div>
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12 pt-8 border-t border-slate-100">

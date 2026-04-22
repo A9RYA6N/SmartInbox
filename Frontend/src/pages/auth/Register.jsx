@@ -7,18 +7,12 @@ import { toast } from "react-hot-toast";
 
 export const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ 
-    username: "", 
-    email: "", 
-    password: "" 
-  });
-
+  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       await registerUser(formData);
       toast.success("Identity established.");

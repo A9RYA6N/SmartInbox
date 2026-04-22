@@ -5,13 +5,29 @@ import { useNavigate } from "react-router-dom";
 import { predictText, getJobStatus } from "../../api/spamApi";
 import { toast } from "react-hot-toast";
 
+const FEATURES = [
+  { icon: Cpu,        title: "ML Pipeline",     desc: "RandomForest classifier with TF-IDF feature extraction, preloaded into memory for instant inference." },
+  { icon: ShieldCheck, title: "Smart Filtering", desc: "Detects phishing patterns, suspicious links, and malicious content with high confidence scoring." },
+  { icon: Sparkles,   title: "Instant Results",  desc: "Sub-30ms predictions returned directly to you with probability scores and confidence metrics." },
+];
+
+const FeatureCard = memo(({ icon: Icon, title, desc }) => (
+  <div className="card p-5">
+    <div className="p-2 bg-slate-100 rounded-xl w-fit mb-3">
+      <Icon className="w-4 h-4 text-slate-600" />
+    </div>
+    <h4 className="text-sm font-semibold text-slate-800 mb-1">{title}</h4>
+    <p className="text-xs text-slate-500 leading-relaxed">{desc}</p>
+  </div>
+));
+
 export const ScanPage = () => {
   const [text, setText] = useState("");
   const [isPredicting, setIsPredicting] = useState(false);
   const [jobId, setJobId] = useState(null);
   const navigate = useNavigate();
 
-  const handlePredict = async () => {
+  const handlePredict = useCallback(async () => {
     if (!text.trim()) return;
     setIsPredicting(true);
     try {
@@ -21,7 +37,11 @@ export const ScanPage = () => {
       toast.error(err.response?.data?.detail || "Analysis failed.");
       setIsPredicting(false);
     }
-  };
+  }, [text, navigate]);
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handlePredict();
+  }, [handlePredict]);
 
   useEffect(() => {
     if (!jobId) return;
@@ -67,6 +87,7 @@ export const ScanPage = () => {
           <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
             {text.length} / 1000
           </div>
+          <span className="text-xs text-slate-400 tabular-nums">{text.length} / 1000</span>
         </div>
 
         <textarea

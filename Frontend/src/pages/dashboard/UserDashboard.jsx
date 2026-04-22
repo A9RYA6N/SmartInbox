@@ -67,7 +67,7 @@ export const UserDashboard = () => {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate("/scan")}
-            className="btn-premium flex items-center gap-2"
+            className="btn-primary flex items-center gap-2"
           >
             <Zap size={16} />
             New Scan

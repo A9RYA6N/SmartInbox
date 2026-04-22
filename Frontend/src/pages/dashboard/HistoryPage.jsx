@@ -53,6 +53,31 @@ const LogItem = memo(({ msg }) => (
   </div>
 ));
 
+const SkeletonRow = () => (
+  <div className="grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-slate-100">
+    <div className="col-span-6 flex gap-3 items-center">
+      <div className="skeleton w-9 h-9 rounded-xl flex-shrink-0" />
+      <div className="space-y-2 flex-1">
+        <div className="skeleton h-3 w-3/4 rounded" />
+        <div className="skeleton h-2.5 w-1/3 rounded" />
+      </div>
+    </div>
+    <div className="col-span-3 flex justify-center">
+      <div className="skeleton h-6 w-16 rounded-full" />
+    </div>
+    <div className="col-span-3 flex flex-col items-end gap-2">
+      <div className="skeleton h-3 w-10 rounded" />
+      <div className="skeleton h-1.5 w-20 rounded" />
+    </div>
+  </div>
+);
+
+const FILTERS = [
+  { label: "All", val: null },
+  { label: "Spam", val: true },
+  { label: "Clean", val: false },
+];
+
 export const HistoryPage = () => {
   const storeHistory = useStore((state) => state.history);
   const [history, setHistory] = useState(storeHistory || []);
@@ -73,8 +98,8 @@ export const HistoryPage = () => {
         size: histData.size || 20,
         totalPages: Math.ceil((histData.total || 0) / (histData.size || 20)),
       });
-    } catch (err) {
-      toast.error("Failed to load telemetry logs.");
+    } catch {
+      toast.error("Failed to load history.");
     } finally {
       setLoading(false);
     }
@@ -90,7 +115,7 @@ export const HistoryPage = () => {
       await exportHistory({ isSpam: filterSpam });
       toast.success("Telemetry report exported.");
     } catch {
-      toast.error("Export sequence failed.");
+      toast.error("Export failed.");
     } finally {
       setIsExporting(false);
     }
@@ -190,7 +215,7 @@ export const HistoryPage = () => {
             >
               <ChevronLeft size={18} />
             </button>
-            <button 
+            <button
               disabled={page >= pagination.totalPages}
               onClick={() => setPage(page + 1)}
               className="p-1.5 bg-white border border-slate-200 rounded-lg disabled:opacity-30 hover:bg-slate-50 transition-all"

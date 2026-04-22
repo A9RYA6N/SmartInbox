@@ -41,8 +41,8 @@ const SmartRedirect = () => {
   return <Navigate to={user.role === "admin" ? "/admin" : "/dashboard"} replace />;
 };
 
-export const AppRoutes = () => {
-  return (
+export const AppRoutes = () => (
+  <Suspense fallback={<PageSkeleton />}>
     <Routes>
       <Route
         path="/"
@@ -105,5 +105,5 @@ export const AppRoutes = () => {
 
       <Route path="*" element={<SmartRedirect />} />
     </Routes>
-  );
-};
+  </Suspense>
+);

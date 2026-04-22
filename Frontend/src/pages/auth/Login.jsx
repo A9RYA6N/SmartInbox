@@ -16,7 +16,6 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       const data = await login(formData.email, formData.password);
       toast.success("Identity verified.");
