@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import axiosRetry from "axios-retry";
+
 const API_URL = import.meta.env.VITE_API_URL || "/api/v1";
 
 /** Extract access token from localStorage — used by REST client and WebSocket. */
@@ -16,7 +18,17 @@ export const getAccessToken = () => {
 export const axiosClient = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
-  timeout: 15000, // 15 s — fast-fail on stalled requests
+  timeout: 30000,
+});
+
+// Configure automatic retries for production resilience
+axiosRetry(axiosClient, { 
+  retries: 3, 
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error) => {
+    // Retry on network errors and 5xx responses
+    return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.response?.status >= 500;
+  }
 });
 
 // Auto-inject JWT

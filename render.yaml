@@ -1,0 +1,30 @@
+services:
+  # ── Backend Service ────────────────────────────────────────────────────────
+  - type: web
+    name: smartinbox-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PORT
+        value: 8000
+      - key: DATABASE_URL
+        sync: false # Set this in Render Dashboard (pooled connection string)
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: "*" # Update to your Amplify URL after first deploy
+      - key: LOG_LEVEL
+        value: INFO
+
+  # ── Precompute Worker (Background Task) ────────────────────────────────────
+  - type: worker
+    name: smartinbox-worker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.services.precompute_worker # If standalone, or it runs inside main lifespan
+    envVars:
+      - key: DATABASE_URL
+        sync: false
