@@ -30,11 +30,13 @@ import requests
 from service import SpamDetectorService, ServiceError, InvalidInputError, ModelNotLoadedError  # noqa: E402
 
 from app.core.config import get_settings
+from app.core.logging import get_logger
 
 settings = get_settings()
+logger = get_logger("ml_service")
 
 # ── Module-level types and helpers (Defined early to avoid circular ImportErrors) ──
-MLService = Annotated[SpamDetectorService, Depends(lambda: _detector if _detector else HTTPException(status_code=503, detail="ML model not loaded"))]
+MLService = Annotated[SpamDetectorService, Depends(lambda: init_spam_detector())]
 
 def translate_ml_error(exc: Exception) -> HTTPException:
     """Convert ML-layer exceptions to appropriate FastAPI HTTPExceptions."""
@@ -53,7 +55,7 @@ _detector: Optional[SpamDetectorService] = None
 def init_spam_detector() -> SpamDetectorService:
     """
     Initialise the SpamDetectorService singleton.
-    Called once from app lifespan, not per-request.
+    Called once from app lifespan, or on-demand via dependency.
     """
     global _detector
     if _detector is not None:
@@ -67,7 +69,6 @@ def init_spam_detector() -> SpamDetectorService:
         return _detector
         
     model_url = os.environ.get("MODEL_URL")
-
     tag = os.environ.get("MODEL_VERSION", settings.MODEL_VERSION)
     
     logger.info(f"[ML] Initializing detector version: {tag}")
@@ -110,13 +111,6 @@ def init_spam_detector() -> SpamDetectorService:
         logger.info(f"[ML] Model {tag} loaded successfully.")
     except Exception as e:
         logger.error(f"[ML] ERROR: Failed to load model: {e}")
-        # We still set the detector so health() can return 'not_loaded' instead of 503
     
     _detector = detector
     return _detector
-
-
-    return HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail="An unexpected error occurred.",
-    )
