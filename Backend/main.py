@@ -252,14 +252,24 @@ async def health_check(request: Request):
         },
     )
 
-@app.get("/debug/logs")
-def get_debug_logs():
+@app.get("/debug/info")
+async def get_debug_info():
     import os
-    if os.path.exists("logs/api.log"):
-        with open("logs/api.log", "r") as f:
-            lines = f.readlines()
-            return {"logs": lines[-100:]}
-    return {"error": "Log file not found"}
+    root = Path(__file__).resolve().parent.parent
+    ml_root = root / "ml"
+    
+    def scan_dir(d):
+        if not d.exists(): return f"MISSING: {d}"
+        return os.listdir(d)
+
+    return {
+        "cwd": os.getcwd(),
+        "root": str(root),
+        "ml": scan_dir(ml_root),
+        "models": scan_dir(ml_root / "models"),
+        "artifacts": scan_dir(ml_root / "artifacts"),
+        "sys_path": sys.path
+    }
 
 
 # ── Redirect common frontend paths to Amplify ──────────────────────────────────
