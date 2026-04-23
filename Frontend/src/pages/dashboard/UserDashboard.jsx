@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   TrendingUp, 
   ShieldCheck, 
@@ -10,7 +10,6 @@ import {
   Sparkles,
   Search,
   BarChart3,
-  RefreshCw,
   Activity
 } from "lucide-react";
 import { 
@@ -21,29 +20,38 @@ import { useNavigate } from "react-router-dom";
 import { getUserStats, getSpamTrends } from "../../api/spamApi";
 import { toast } from "react-hot-toast";
 
-const StatsCard = ({ title, value, icon: Icon, color, trend }) => (
-  <motion.div 
-    whileHover={{ y: -5 }}
-    className="glass-card p-6 flex flex-col justify-between"
-  >
-    <div className="flex justify-between items-start">
-      <div className={`p-3 rounded-xl bg-${color}-500/10 border border-${color}-500/20`}>
-        <Icon className={`w-6 h-6 text-${color}-400`} />
-      </div>
-      {trend && (
-        <div className="flex items-center gap-1 text-emerald-400 text-xs font-bold bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
-          <ArrowUpRight size={14} />
-          {trend}
+const StatsCard = ({ title, value, icon: Icon, color, trend }) => {
+  const colors = {
+    blue: "text-blue-600 bg-blue-50 border-blue-100",
+    purple: "text-purple-600 bg-purple-50 border-purple-100",
+    rose: "text-rose-600 bg-rose-50 border-rose-100",
+    amber: "text-amber-600 bg-amber-50 border-amber-100",
+    cyan: "text-cyan-600 bg-cyan-50 border-cyan-100",
+    emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
+  };
+  
+  const iconStyle = colors[color] || colors.blue;
+
+  return (
+    <div className="minimal-card p-6 flex flex-col justify-between">
+      <div className="flex justify-between items-start">
+        <div className={`p-2.5 rounded-lg border ${iconStyle}`}>
+          <Icon className="w-5 h-5" />
         </div>
-      )}
+        {trend && (
+          <div className="flex items-center gap-1 text-emerald-700 text-xs font-semibold bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
+            <ArrowUpRight size={14} />
+            {trend}
+          </div>
+        )}
+      </div>
+      <div className="mt-4">
+        <p className="text-slate-500 text-sm font-medium">{title}</p>
+        <h3 className="text-2xl font-bold text-slate-800 mt-1">{value}</h3>
+      </div>
     </div>
-    <div className="mt-4">
-      <p className="text-slate-500 text-sm font-medium">{title}</p>
-      <h3 className="text-3xl font-bold text-white mt-1">{value}</h3>
-    </div>
-    <div className="shimmer absolute inset-0 rounded-2xl pointer-events-none opacity-50" />
-  </motion.div>
-);
+  );
+};
 
 export const UserDashboard = () => {
   const { user } = useAuth();
@@ -92,34 +100,32 @@ export const UserDashboard = () => {
   }, [fetchTrends]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-tight">
-            Welcome back, <span className="neon-text-blue">{user?.username || "Commander"}</span>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            Overview
           </h1>
-          <p className="text-slate-400 mt-2 font-medium">Your intelligence dashboard is live and monitoring.</p>
+          <p className="text-slate-500 mt-1 text-sm">Welcome back, {user?.username || "Commander"}. Here's what's happening today.</p>
         </div>
         
         <div className="flex items-center gap-3">
           <button 
             onClick={() => toast("Press ⌘K to open the command palette", { icon: "⌨️" })}
-            className="glass border-white/10 px-4 py-2 rounded-xl text-slate-300 hover:text-white transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all flex items-center gap-2"
           >
-            <Search size={18} />
-            <span className="text-sm font-bold">Quick Search</span>
-            <kbd className="hidden sm:inline-block bg-white/10 px-1.5 py-0.5 rounded text-[10px] ml-2">⌘K</kbd>
+            <Search size={16} />
+            <span className="text-sm font-medium">Search</span>
+            <kbd className="hidden sm:inline-block bg-white border border-slate-200 px-1.5 py-0.5 rounded text-[10px] ml-2 font-mono text-slate-500">⌘K</kbd>
           </button>
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button 
             onClick={() => navigate("/scan")}
-            className="btn-premium flex items-center gap-2"
+            className="btn-primary flex items-center gap-2"
           >
-            <Zap size={18} />
+            <Zap size={16} />
             <span>New Scan</span>
-          </motion.button>
+          </button>
         </div>
       </div>
 
@@ -143,29 +149,30 @@ export const UserDashboard = () => {
           title="Threat Level" 
           value={loading ? "..." : stats.threat_level} 
           icon={AlertTriangle} 
-          color={stats.threat_level === "High" ? "rose" : stats.threat_level === "Medium" ? "amber" : "cyan"} 
+          color={stats.threat_level === "High" ? "rose" : stats.threat_level === "Medium" ? "amber" : "emerald"} 
         />
         <StatsCard 
           title="Uptime" 
           value="99.9%" 
           icon={Clock} 
-          color="pink" 
+          color="cyan" 
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="glass-card p-8">
-            <div className="flex justify-between items-start mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Chart */}
+        <div className="lg:col-span-2">
+          <div className="minimal-card p-6 h-full">
+            <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Activity className="text-cyan-400 w-5 h-5" />
-                  {lookback === 365 ? '1-Year' : `${lookback}-Day`} Traffic Telemetry
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <Activity className="text-slate-500 w-4 h-4" />
+                  Traffic Telemetry
                 </h2>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Daily classification density breakdown</p>
+                <p className="text-xs text-slate-500 mt-1">Daily classification volume over time</p>
               </div>
               
-              <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
+              <div className="flex bg-slate-100 p-1 rounded-lg">
                 {[
                   { label: "7D", value: 7 },
                   { label: "14D", value: 14 },
@@ -175,10 +182,10 @@ export const UserDashboard = () => {
                   <button
                     key={opt.value}
                     onClick={() => setLookback(opt.value)}
-                    className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
                       lookback === opt.value 
-                        ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20' 
-                        : 'text-slate-500 hover:text-white'
+                        ? 'bg-white text-slate-900 shadow-sm' 
+                        : 'text-slate-500 hover:text-slate-700'
                     }`}
                   >
                     {opt.label}
@@ -187,50 +194,52 @@ export const UserDashboard = () => {
               </div>
             </div>
 
-            <div className="h-[350px] w-full">
+            <div className="h-[300px] w-full">
               {loadingTrends ? (
                 <div className="h-full flex items-center justify-center">
-                  <div className="w-10 h-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
                 </div>
               ) : trends.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trends}>
+                  <AreaChart data={trends} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                     <defs>
-                      <linearGradient id="dashSpam" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                      <linearGradient id="colorSpam" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.1}/>
                         <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
                       </linearGradient>
-                      <linearGradient id="dashHam" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                      <linearGradient id="colorHam" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.1}/>
+                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="rgba(255,255,255,0.2)" 
-                      fontSize={9} 
+                      stroke="#94a3b8" 
+                      fontSize={11} 
                       tickLine={false} 
                       axisLine={false}
+                      tickMargin={10}
                       tickFormatter={(str) => {
                         const d = new Date(str);
                         return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                       }}
                     />
-                    <YAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} tickMargin={10} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: "#020617", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px", fontSize: "10px" }}
+                      contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "12px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
+                      itemStyle={{ color: "#0f172a", fontWeight: 500 }}
                     />
-                    <Area type="monotone" dataKey="spam_count" name="Spam" stroke="#f43f5e" fillOpacity={1} fill="url(#dashSpam)" strokeWidth={2} />
-                    <Area type="monotone" dataKey="ham_count" name="Clean" stroke="#06b6d4" fillOpacity={1} fill="url(#dashHam)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="spam_count" name="Spam" stroke="#f43f5e" fillOpacity={1} fill="url(#colorSpam)" strokeWidth={2} />
+                    <Area type="monotone" dataKey="ham_count" name="Clean" stroke="#0ea5e9" fillOpacity={1} fill="url(#colorHam)" strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
-                    <BarChart3 className="text-slate-600 w-8 h-8" />
+                <div className="h-full flex flex-col items-center justify-center text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
+                    <BarChart3 className="text-slate-500 w-5 h-5" />
                   </div>
-                  <p className="text-slate-500 text-sm font-medium">No telemetry data available for this period.</p>
+                  <p className="text-slate-500 text-sm">No telemetry data available.</p>
                 </div>
               )}
             </div>
@@ -238,44 +247,40 @@ export const UserDashboard = () => {
         </div>
 
         {/* Right Column - AI Insights & Activity */}
-        <div className="space-y-8">
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="glass-card p-6 border-l-4 border-l-cyan-500"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="text-cyan-400 w-5 h-5" />
-              <h2 className="text-lg font-bold text-white">AI Insights</h2>
+        <div className="space-y-6">
+          <div className="minimal-card p-6 border-l-4 border-l-blue-500 bg-blue-50/30">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="text-blue-500 w-4 h-4" />
+              <h2 className="text-sm font-semibold text-slate-900">AI Insights</h2>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed italic">
-              "We noticed an 18% increase in phishing attempts from 'unverified' senders in the last 24 hours. Consider updating your filter threshold to 0.75 for better protection."
+            <p className="text-sm text-slate-600 leading-relaxed">
+              We noticed a minor increase in phishing attempts from unverified senders. We recommend keeping your filter threshold at 0.75 for optimal protection.
             </p>
             <button 
-              onClick={() => toast.success("Threshold updated to 0.75")}
-              className="mt-4 text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1"
+              onClick={() => toast.success("Threshold maintained")}
+              className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
             >
-              Apply Recommendation <ArrowUpRight size={12} />
+              Acknowledge <ArrowUpRight size={12} />
             </button>
-          </motion.div>
+          </div>
 
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-bold text-white mb-6">Recent Activity</h2>
-            <div className="space-y-6">
+          <div className="minimal-card p-6">
+            <h2 className="text-sm font-semibold text-slate-900 mb-4">Recent Activity</h2>
+            <div className="space-y-5">
               {[
-                { time: "2m ago", text: "Spam message blocked from +1 (202) 555-0122", type: "blocked" },
-                { time: "15m ago", text: "New model version v2.4 deployed", type: "system" },
-                { time: "1h ago", text: "Security audit completed - 0 threats", type: "success" },
-                { time: "3h ago", text: "Batch upload: 500 messages scanned", type: "info" }
+                { time: "2m ago", text: "Spam blocked from +1 (202) 555-0122", type: "blocked" },
+                { time: "15m ago", text: "System definitions updated", type: "system" },
+                { time: "1h ago", text: "Daily security scan completed", type: "success" },
+                { time: "3h ago", text: "Batch scan: 500 messages processed", type: "info" }
               ].map((item, i) => (
-                <div key={i} className="flex gap-4 items-start">
-                  <div className={`mt-1.5 w-2 h-2 rounded-full ${
+                <div key={i} className="flex gap-3 items-start">
+                  <div className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
                     item.type === 'blocked' ? 'bg-rose-500' : 
-                    item.type === 'system' ? 'bg-cyan-500' : 
-                    item.type === 'success' ? 'bg-emerald-500' : 'bg-slate-500'
-                  } shadow-[0_0_8px_currentColor]`} />
+                    item.type === 'system' ? 'bg-blue-500' : 
+                    item.type === 'success' ? 'bg-emerald-500' : 'bg-slate-400'
+                  }`} />
                   <div>
-                    <p className="text-sm text-slate-300 font-medium">{item.text}</p>
+                    <p className="text-sm text-slate-700 leading-tight">{item.text}</p>
                     <p className="text-xs text-slate-500 mt-1">{item.time}</p>
                   </div>
                 </div>
@@ -283,7 +288,7 @@ export const UserDashboard = () => {
             </div>
             <button 
               onClick={() => navigate("/history")}
-              className="w-full mt-6 py-2 bg-white/5 rounded-xl text-xs font-bold text-slate-400 hover:bg-white/10 hover:text-white transition-all"
+              className="w-full mt-5 py-2 rounded-lg text-xs font-medium text-slate-500 border border-slate-200 hover:bg-slate-50 transition-colors"
             >
               View All Activity
             </button>
@@ -293,5 +298,3 @@ export const UserDashboard = () => {
     </div>
   );
 };
-
-

@@ -165,10 +165,10 @@ export const AdminUsersPage = () => {
           <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase text-indigo-400">
             <Users size={14} /> Entity Management
           </div>
-          <h1 className="text-5xl font-black text-white tracking-tighter">
-            User <span className="neon-text-blue">Matrix</span>
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter">
+            User <span className="text-blue-600 font-semibold">Matrix</span>
           </h1>
-          <p className="text-slate-400 max-w-xl font-medium">
+          <p className="text-slate-500 max-w-xl font-medium">
             Oversee all registered entities, roles, and historical activity logs.
           </p>
         </div>
@@ -180,12 +180,12 @@ export const AdminUsersPage = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search entities..."
-              className="glass pl-11 pr-4 h-12 rounded-xl border-white/10 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-all w-64"
+              className=" pl-11 pr-4 h-12 rounded-xl border-slate-200 text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 transition-all w-64"
             />
           </div>
           <button 
             onClick={() => fetchUsers()}
-            className="glass p-3 rounded-xl border-white/10 text-slate-400 hover:text-white transition-all"
+            className=" p-3 rounded-xl border-slate-200 text-slate-500 hover:text-slate-900 transition-all"
           >
             <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
           </button>
@@ -193,8 +193,8 @@ export const AdminUsersPage = () => {
       </div>
 
       {/* User Grid */}
-      <div className="glass rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-        <div className="grid grid-cols-12 gap-6 px-8 py-4 bg-white/5 border-b border-white/5 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
+      <div className=" rounded-3xl border border-slate-200 shadow-md overflow-hidden">
+        <div className="grid grid-cols-12 gap-6 px-8 py-4 bg-slate-50 border-b border-slate-100 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
           <div className="col-span-3">Entity Details</div>
           <div className="col-span-2 text-center">Authorization</div>
           <div className="col-span-3 text-center">Activity Metrics</div>
@@ -219,11 +219,11 @@ export const AdminUsersPage = () => {
                     className="grid grid-cols-12 gap-6 px-8 py-6 items-center hover:bg-white/[0.02] transition-colors group"
                   >
                     <div className="col-span-3 flex gap-4 items-center">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-sm font-black text-white shadow-lg">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-sm font-black text-slate-900 shadow-lg">
                         {u.username?.[0]?.toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-white truncate">{u.username}</p>
+                        <p className="text-sm font-bold text-slate-900 truncate">{u.username}</p>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1 flex items-center gap-2">
                           <Mail size={10} /> {u.email}
                         </p>
@@ -236,7 +236,7 @@ export const AdminUsersPage = () => {
                           <Crown size={12} /> Admin
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[9px] font-black uppercase tracking-widest">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-700 text-slate-500 text-[9px] font-black uppercase tracking-widest">
                           <Shield size={12} /> User
                         </div>
                       )}
@@ -248,7 +248,7 @@ export const AdminUsersPage = () => {
                         <span className="text-slate-500">/</span>
                         <span className="text-emerald-400">{u.ham_count || 0}</span>
                       </div>
-                      <div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden">
+                      <div className="w-32 h-1 bg-slate-50 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-cyan-500 shadow-[0_0_8px_currentColor]" 
                           style={{ width: `${Math.min(100, ((u.prediction_count || 0) / 100) * 100)}%` }} 
@@ -275,27 +275,27 @@ export const AdminUsersPage = () => {
                             });
                           }
                         }}
-                        className="p-2 rounded-xl border border-white/5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                        className="p-2 rounded-xl border border-slate-100 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
                         title="Dispatch Alert"
                       >
                         <Bell size={16} />
                       </button>
                       <button 
                         onClick={() => handleViewAnalytics(u)}
-                        className="p-2 rounded-xl border border-white/5 text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                        className="p-2 rounded-xl border border-slate-100 text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
                         title="View Analytics"
                       >
                         <BarChart2 size={16} />
                       </button>
                       <button 
                         onClick={() => handleToggle(u.id, u.is_active)}
-                        className={`p-2 rounded-xl border border-white/5 hover:text-white transition-all ${u.is_active ? "text-rose-400 hover:bg-rose-500/10" : "text-emerald-400 hover:bg-emerald-500/10"}`}
+                        className={`p-2 rounded-xl border border-slate-100 hover:text-slate-900 transition-all ${u.is_active ? "text-rose-400 hover:bg-rose-500/10" : "text-emerald-400 hover:bg-emerald-500/10"}`}
                       >
                         {u.is_active ? <UserX size={16} /> : <UserCheck size={16} />}
                       </button>
                       <button 
                         onClick={() => setConfirmDelete(u)}
-                        className="p-2 rounded-xl border border-white/5 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
+                        className="p-2 rounded-xl border border-slate-100 text-slate-600 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -308,7 +308,7 @@ export const AdminUsersPage = () => {
         </div>
 
         {/* Pagination */}
-        <div className="p-6 bg-white/[0.02] border-t border-white/5 flex justify-between items-center">
+        <div className="p-6 bg-white/[0.02] border-t border-slate-100 flex justify-between items-center">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
             Page {page} of {totalPages}
           </p>
@@ -316,14 +316,14 @@ export const AdminUsersPage = () => {
             <button 
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
-              className="p-2 glass border-white/10 rounded-xl disabled:opacity-30 hover:text-white transition-all"
+              className="p-2  border-slate-200 rounded-xl disabled:opacity-30 hover:text-slate-900 transition-all"
             >
               <ChevronLeft size={20} />
             </button>
             <button 
               disabled={page >= totalPages}
               onClick={() => setPage(page + 1)}
-              className="p-2 glass border-white/10 rounded-xl disabled:opacity-30 hover:text-white transition-all"
+              className="p-2  border-slate-200 rounded-xl disabled:opacity-30 hover:text-slate-900 transition-all"
             >
               <ChevronRight size={20} />
             </button>
@@ -346,29 +346,29 @@ export const AdminUsersPage = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="relative w-full max-w-md glass p-8 rounded-3xl border border-rose-500/30 shadow-2xl space-y-6"
+              className="relative w-full max-w-md  p-8 rounded-3xl border border-rose-500/30 shadow-md space-y-6"
             >
               <div className="flex items-center gap-4 text-rose-400">
                 <div className="p-3 bg-rose-500/10 rounded-2xl border border-rose-500/20">
                   <AlertTriangle size={24} />
                 </div>
-                <h3 className="text-xl font-bold text-white">Confirm Purge</h3>
+                <h3 className="text-xl font-bold text-slate-900">Confirm Purge</h3>
               </div>
               
-              <p className="text-sm text-slate-400 leading-relaxed">
-                You are about to permanently purge entity <span className="text-white font-bold">{confirmDelete.username}</span> from the matrix. All associated telemetry and packet logs will be erased.
+              <p className="text-sm text-slate-500 leading-relaxed">
+                You are about to permanently purge entity <span className="text-slate-900 font-bold">{confirmDelete.username}</span> from the matrix. All associated telemetry and packet logs will be erased.
               </p>
 
               <div className="flex gap-4">
                 <button 
                   onClick={() => setConfirmDelete(null)}
-                  className="flex-1 h-12 glass border-white/10 rounded-xl text-xs font-black uppercase tracking-widest hover:text-white"
+                  className="flex-1 h-12  border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest hover:text-slate-900"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={() => handleDelete(confirmDelete)}
-                  className="flex-1 h-12 bg-rose-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/20 hover:bg-rose-600"
+                  className="flex-1 h-12 bg-rose-500 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg  hover:bg-rose-600"
                 >
                   Purge Entity
                 </button>
@@ -387,57 +387,57 @@ export const AdminUsersPage = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedUser(null)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-xl"
+              className="absolute inset-0 bg-black/80 "
             />
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
-              className="relative w-full max-w-4xl glass p-10 rounded-[40px] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] space-y-8"
+              className="relative w-full max-w-4xl  p-10 rounded-[40px] border border-slate-200 shadow-[0_0_100px_rgba(0,0,0,0.5)] space-y-8"
             >
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-2xl font-black text-white shadow-2xl">
+                  <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-2xl font-black text-slate-900 shadow-md">
                     {selectedUser.username?.[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="text-3xl font-black text-white tracking-tighter">{selectedUser.username}</h3>
+                    <h3 className="text-3xl font-black text-slate-900 tracking-tighter">{selectedUser.username}</h3>
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">{selectedUser.email}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setSelectedUser(null)}
-                  className="p-3 glass rounded-2xl border-white/10 text-slate-400 hover:text-white transition-all"
+                  className="p-3  rounded-2xl border-slate-200 text-slate-500 hover:text-slate-900 transition-all"
                 >
                   <RefreshCw size={20} />
                 </button>
               </div>
 
               <div className="grid grid-cols-3 gap-6">
-                <div className="glass p-6 rounded-3xl border-white/5">
+                <div className=" p-6 rounded-3xl border-slate-100">
                   <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Scans</p>
-                  <h4 className="text-2xl font-black text-white">{selectedUser.prediction_count}</h4>
+                  <h4 className="text-2xl font-black text-slate-900">{selectedUser.prediction_count}</h4>
                 </div>
-                <div className="glass p-6 rounded-3xl border-white/5">
+                <div className=" p-6 rounded-3xl border-slate-100">
                   <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Spam Detected</p>
-                  <h4 className="text-2xl font-black text-white">{selectedUser.spam_count}</h4>
+                  <h4 className="text-2xl font-black text-slate-900">{selectedUser.spam_count}</h4>
                 </div>
-                <div className="glass p-6 rounded-3xl border-white/5">
+                <div className=" p-6 rounded-3xl border-slate-100">
                   <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Clean Messages</p>
-                  <h4 className="text-2xl font-black text-white">{selectedUser.ham_count}</h4>
+                  <h4 className="text-2xl font-black text-slate-900">{selectedUser.ham_count}</h4>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <div>
-                    <h5 className="text-lg font-bold text-white flex items-center gap-2">
+                    <h5 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                       <Zap className="text-cyan-400 w-4 h-4" />
                       {analyticsDays === 365 ? '1-Year' : `${analyticsDays}-Day`} Traffic Telemetry
                     </h5>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Daily classification density breakdown</p>
                   </div>
-                  <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
+                  <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
                     {[
                       { l: '7D', v: 7 },
                       { l: '14D', v: 14 },
@@ -449,8 +449,8 @@ export const AdminUsersPage = () => {
                         onClick={() => changeAnalyticsDays(t.v)}
                         className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
                           analyticsDays === t.v 
-                            ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20' 
-                            : 'text-slate-500 hover:text-white'
+                            ? 'bg-cyan-500 text-black shadow-lg ' 
+                            : 'text-slate-500 hover:text-slate-900'
                         }`}
                       >
                         {t.l}
@@ -459,7 +459,7 @@ export const AdminUsersPage = () => {
                   </div>
                 </div>
 
-                <div className="h-[300px] w-full bg-white/[0.02] rounded-3xl p-6 border border-white/5">
+                <div className="h-[300px] w-full bg-white/[0.02] rounded-3xl p-6 border border-slate-100">
                   {loadingStats ? (
                     <div className="h-full flex items-center justify-center">
                       <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
@@ -512,14 +512,14 @@ export const AdminUsersPage = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="relative w-full max-w-lg glass p-8 rounded-[32px] border border-white/10 shadow-2xl space-y-6"
+              className="relative w-full max-w-lg  p-8 rounded-[32px] border border-slate-200 shadow-md space-y-6"
             >
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-rose-500/10 rounded-2xl border border-rose-500/20 text-rose-400">
                   <Bell size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">Dispatch Security Alert</h3>
+                  <h3 className="text-xl font-bold text-slate-900">Dispatch Security Alert</h3>
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Recipient: {notifyingUser.username}</p>
                 </div>
               </div>
@@ -530,7 +530,7 @@ export const AdminUsersPage = () => {
                   <input 
                     value={notifContent.title}
                     onChange={(e) => setNotifContent({...notifContent, title: e.target.value})}
-                    className="input-premium w-full h-12 text-sm"
+                    className="input-base w-full h-12 text-sm"
                     placeholder="Security Breach Detected"
                   />
                 </div>
@@ -539,7 +539,7 @@ export const AdminUsersPage = () => {
                   <textarea 
                     value={notifContent.message}
                     onChange={(e) => setNotifContent({...notifContent, message: e.target.value})}
-                    className="input-premium w-full h-32 text-sm p-4 resize-none"
+                    className="input-base w-full h-32 text-sm p-4 resize-none"
                     placeholder="Enter warning details..."
                   />
                 </div>
@@ -547,14 +547,14 @@ export const AdminUsersPage = () => {
                   <button 
                     type="button"
                     onClick={() => setNotifyingUser(null)}
-                    className="flex-1 h-12 glass border-white/10 rounded-xl text-xs font-black uppercase tracking-widest hover:text-white"
+                    className="flex-1 h-12  border-slate-200 rounded-xl text-xs font-black uppercase tracking-widest hover:text-slate-900"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
                     disabled={sendingNotif}
-                    className="flex-1 h-12 bg-rose-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/20 hover:bg-rose-600 flex items-center justify-center gap-2"
+                    className="flex-1 h-12 bg-rose-500 text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg  hover:bg-rose-600 flex items-center justify-center gap-2"
                   >
                     {sendingNotif ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
