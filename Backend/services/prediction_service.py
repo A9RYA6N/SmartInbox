@@ -76,7 +76,13 @@ async def process_prediction_job(
                 job_id, 
                 status=JobStatus.COMPLETED, 
                 progress=100, 
-                result={"prediction_id": str(pred.id), "is_spam": pred.is_spam, "probability": pred.probability}
+                result={
+                    "prediction_id": str(pred.id), 
+                    "text": text,
+                    "prediction": 1 if pred.is_spam else 0,
+                    "is_spam": pred.is_spam, 
+                    "probability": pred.probability
+                }
             )
     except Exception as e:
         logger.error(f"Prediction job {job_id} failed: {e}\n{traceback.format_exc()}")
