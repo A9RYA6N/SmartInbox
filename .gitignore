@@ -43,16 +43,11 @@ pnpm-debug.log*
 *.db
 
 # ML / Data / Artifacts
-*.pkl
-*.model
-*.h5
-*.hdf5
-*.pt
-*.pth
+# Allow specific models and artifacts for deployment
+!ml/models/*.pkl
+!ml/artifacts/
 data/
 ml/data/
-ml/models/
-ml/artifacts/
 ml/logs/
 *.csv
 !sample_*.csv
