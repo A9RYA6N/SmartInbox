@@ -53,6 +53,7 @@ data/
 ml/data/
 ml/models/
 !ml/artifacts/
+!ml/artifacts/*.pkl
 ml/logs/
 *.csv
 !sample_*.csv

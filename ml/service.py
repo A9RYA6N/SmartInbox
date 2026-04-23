@@ -100,9 +100,28 @@ class SpamDetectorService:
         metadata_path = _ARTIFACTS_DIR / f"metadata_{tag}.json"
         threshold_path = _ARTIFACTS_DIR / f"threshold_optimiser_{tag}.pkl"
 
+        import os
+        logger.info(f"[ML-DEBUG] Current Working Directory: {os.getcwd()}")
+        logger.info(f"[ML-DEBUG] Expected ML Dir: {_ML_DIR}")
+        logger.info(f"[ML-DEBUG] Expected Models Dir: {_MODELS_DIR}")
+        logger.info(f"[ML-DEBUG] Expected Artifacts Dir: {_ARTIFACTS_DIR}")
+        
+        # Debug list directory contents
+        if _MODELS_DIR.exists():
+            logger.info(f"[ML-DEBUG] Models Dir contents: {os.listdir(_MODELS_DIR)}")
+        else:
+            logger.error(f"[ML-DEBUG] Models Dir does NOT exist!")
+            
+        if _ARTIFACTS_DIR.exists():
+            logger.info(f"[ML-DEBUG] Artifacts Dir contents: {os.listdir(_ARTIFACTS_DIR)}")
+        else:
+            logger.error(f"[ML-DEBUG] Artifacts Dir does NOT exist!")
+
         if not model_path.exists():
+            logger.error(f"[ML-DEBUG] Model file missing: {model_path}")
             raise ModelNotLoadedError(f"Model file not found: {model_path}")
         if not pipeline_path.exists():
+            logger.error(f"[ML-DEBUG] Pipeline file missing: {pipeline_path}")
             raise ModelNotLoadedError(f"Pipeline file not found: {pipeline_path}")
 
         logger.info("Loading model %s from %s", tag, model_path)
