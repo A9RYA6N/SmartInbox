@@ -58,19 +58,19 @@ def init_spam_detector() -> SpamDetectorService:
     global _detector
     if _detector is not None:
         if not _detector._loaded:
-            print("[ML] Detector found but not loaded. Retrying load...")
+            logger.info("[ML] Detector found but not loaded. Retrying load...")
             try:
                 _detector._load()
-                print(f"[ML] Model {_detector._model_version} loaded successfully on retry.")
+                logger.info(f"[ML] Model {_detector._model_version} loaded successfully on retry.")
             except Exception as e:
-                print(f"[ML] ERROR: Retry failed: {e}")
+                logger.error(f"[ML] ERROR: Retry failed: {e}")
         return _detector
         
     model_url = os.environ.get("MODEL_URL")
 
     tag = os.environ.get("MODEL_VERSION", settings.MODEL_VERSION)
     
-    print(f"[ML] Initializing detector version: {tag}")
+    logger.info(f"[ML] Initializing detector version: {tag}")
     
     detector = SpamDetectorService(
         model_version=tag,
@@ -88,7 +88,7 @@ def init_spam_detector() -> SpamDetectorService:
                 if "dl=1" not in model_url:
                     model_url = model_url + ("&" if "?" in model_url else "?") + "dl=1"
             
-            print(f"[ML] Model missing at {model_path}. Downloading from {model_url}...")
+            logger.info(f"[ML] Model missing at {model_path}. Downloading from {model_url}...")
             try:
                 os.makedirs(model_path.parent, exist_ok=True)
                 response = requests.get(model_url, stream=True, timeout=60)
@@ -99,17 +99,17 @@ def init_spam_detector() -> SpamDetectorService:
                         if chunk:
                             f.write(chunk)
                             size += len(chunk)
-                print(f"[ML] Download complete ({size} bytes): {model_path}")
+                logger.info(f"[ML] Download complete ({size} bytes): {model_path}")
             except Exception as e:
-                print(f"[ML] CRITICAL: Download failed: {e}")
+                logger.error(f"[ML] CRITICAL: Download failed: {e}")
         else:
-            print(f"[ML] WARNING: Model missing and no MODEL_URL provided.")
+            logger.warning(f"[ML] WARNING: Model missing and no MODEL_URL provided.")
 
     try:
         detector._load()
-        print(f"[ML] Model {tag} loaded successfully.")
+        logger.info(f"[ML] Model {tag} loaded successfully.")
     except Exception as e:
-        print(f"[ML] ERROR: Failed to load model: {e}")
+        logger.error(f"[ML] ERROR: Failed to load model: {e}")
         # We still set the detector so health() can return 'not_loaded' instead of 503
     
     _detector = detector
