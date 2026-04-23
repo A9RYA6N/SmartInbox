@@ -33,6 +33,19 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
+# ── Module-level types and helpers (Defined early to avoid circular ImportErrors) ──
+MLService = Annotated[SpamDetectorService, Depends(lambda: _detector if _detector else HTTPException(status_code=503, detail="ML model not loaded"))]
+
+def translate_ml_error(exc: Exception) -> HTTPException:
+    """Convert ML-layer exceptions to appropriate FastAPI HTTPExceptions."""
+    if isinstance(exc, ModelNotLoadedError):
+        return HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc))
+    if isinstance(exc, InvalidInputError):
+        return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc))
+    if isinstance(exc, ServiceError):
+        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
+    return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred.")
+
 # ── Module-level singleton (loaded once at startup) ───────────────────────────
 _detector: Optional[SpamDetectorService] = None
 
@@ -103,41 +116,6 @@ def init_spam_detector() -> SpamDetectorService:
     return _detector
 
 
-def get_spam_detector() -> SpamDetectorService:
-    """
-    FastAPI dependency: return the already-initialised SpamDetectorService.
-    Raises 503 if the model was never loaded (startup failure).
-    """
-    if _detector is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="ML model is not loaded. The service may still be starting up.",
-        )
-    return _detector
-
-
-MLService = Annotated[SpamDetectorService, Depends(get_spam_detector)]
-
-
-# ── Exception translator ──────────────────────────────────────────────────────
-
-def translate_ml_error(exc: Exception) -> HTTPException:
-    """Convert ML-layer exceptions to appropriate FastAPI HTTPExceptions."""
-    if isinstance(exc, ModelNotLoadedError):
-        return HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc),
-        )
-    if isinstance(exc, InvalidInputError):
-        return HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
-        )
-    if isinstance(exc, ServiceError):
-        return HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(exc),
-        )
     return HTTPException(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         detail="An unexpected error occurred.",
