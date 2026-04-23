@@ -1,6 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { motion } from "framer-motion";
-import { FileText, ShieldCheck, Zap, Lock, ChevronRight, Search, Cpu, Loader2 } from "lucide-react";
+import { 
+  FileText, 
+  ShieldCheck, 
+  Zap, 
+  Lock, 
+  ChevronRight, 
+  Search, 
+  Cpu, 
+  Loader2,
+  Sparkles 
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { predictText, getJobStatus } from "../../api/spamApi";
 import { toast } from "react-hot-toast";

@@ -20,28 +20,6 @@ export const ResultsPage = () => {
   if (!result) return <Navigate to="/scan" replace />;
 
   const isSpam = result.prediction === 1;
-  const probPct = (result.probability * 100).toFixed(1);
-  const confPct = result.confidence !== undefined ? (result.confidence * 100).toFixed(0) : null;
-
-  const handleDownload = () => {
-    const rows = [
-      ["Message", "Verdict", "Probability (%)", "Model", "Timestamp"],
-      [
-        `"${(result.text || "").replace(/"/g, '""')}"`,
-        isSpam ? "SPAM" : "HAM",
-        probPct,
-        result.model_version || "v3",
-        new Date().toISOString(),
-      ],
-    ];
-    const csv = rows.map(r => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement("a"), { href: url, download: `smartinbox_${Date.now()}.csv` });
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Report downloaded.");
-  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in">
@@ -116,62 +94,47 @@ export const ResultsPage = () => {
               <div className={`inline-flex items-center gap-2 px-4 py-1 rounded-full border ${isSpam ? "bg-rose-50 border-rose-100 text-rose-600" : "bg-emerald-50 border-emerald-100 text-emerald-600"} text-[9px] font-black uppercase tracking-widest`}>
                 {isSpam ? "Dangerous" : "Secure"}
               </div>
-            ))}
-          </div>
-        </div>
-
-            <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
-              <div className="text-center">
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Latency</p>
-                <p className="text-lg font-black text-slate-900">14ms</p>
-              </div>
-              <div className="text-center">
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Model</p>
-                <p className="text-lg font-black text-slate-900">v1.0</p>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12 pt-8 border-t border-slate-100">
-          <button 
-            onClick={() => navigate("/scan")}
-            className="btn-premium flex items-center gap-3 px-10 h-12 w-full sm:w-auto"
-          >
-            <span className="text-[10px] font-bold tracking-widest uppercase">New Scan</span>
-            <ChevronRight size={16} />
-          </button>
-          
-          <button 
-            onClick={() => {
-              const header = ["Message", "Verdict", "Probability (%)"];
-              const verdictStr = isSpam ? "SPAM" : "CLEAN";
-              const lines = [header.join(","), [`"${result.text}"`, verdictStr, (result.probability * 100).toFixed(1)].join(",")];
-              const blob = new Blob([lines.join("\n")], { type: "text/csv" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `smartinbox_report_${Date.now()}.csv`;
-              a.click();
-              toast.success("Report downloaded.");
-            }}
-            className="bg-white border border-slate-200 px-10 h-12 w-full sm:w-auto flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all rounded-xl"
-          >
-            <Download size={16} /> Export
-          </button>
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12 pt-8 border-t border-slate-100">
+        <button 
+          onClick={() => navigate("/scan")}
+          className="btn-premium flex items-center gap-3 px-10 h-12 w-full sm:w-auto"
+        >
+          <span className="text-[10px] font-bold tracking-widest uppercase">New Scan</span>
+          <ChevronRight size={16} />
+        </button>
+        
+        <button 
+          onClick={() => {
+            const header = ["Message", "Verdict", "Probability (%)"];
+            const verdictStr = isSpam ? "SPAM" : "CLEAN";
+            const lines = [header.join(","), [`"${result.text}"`, verdictStr, (result.probability * 100).toFixed(1)].join(",")];
+            const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `smartinbox_report_${Date.now()}.csv`;
+            a.click();
+            toast.success("Report downloaded.");
+          }}
+          className="bg-white border border-slate-200 px-10 h-12 w-full sm:w-auto flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase hover:bg-slate-50 transition-all rounded-xl"
+        >
+          <Download size={16} /> Export
+        </button>
 
-          <button 
-            onClick={() => navigate("/dashboard")}
-            className="text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2 px-6"
-          >
-            <ArrowLeft size={16} />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Dashboard</span>
-          </button>
-        </div>
+        <button 
+          onClick={() => navigate("/dashboard")}
+          className="text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2 px-6"
+        >
+          <ArrowLeft size={16} />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Dashboard</span>
+        </button>
       </div>
     </div>
   );
 };
-

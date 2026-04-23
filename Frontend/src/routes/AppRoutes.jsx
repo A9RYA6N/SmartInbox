@@ -42,7 +42,11 @@ const SmartRedirect = () => {
 };
 
 export const AppRoutes = () => (
-  <Suspense fallback={<PageSkeleton />}>
+  <Suspense fallback={
+    <div className="flex h-screen w-screen items-center justify-center bg-slate-50">
+      <Spinner size={48} className="text-indigo-600" />
+    </div>
+  }>
     <Routes>
       <Route
         path="/"

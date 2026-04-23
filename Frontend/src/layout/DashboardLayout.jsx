@@ -1,14 +1,18 @@
 import React, { useState, memo } from "react";
 import { Sidebar } from "./Sidebar";
 import { NotificationBell } from "../components/ui/NotificationBell";
+import { CommandPalette } from "../components/ui/CommandPalette";
 import { Outlet, useLocation } from "react-router-dom";
+import { Command } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const DashboardLayout = memo(() => {
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
   const location = useLocation();
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden relative">
-      <CommandPalette isOpen={isCommandOpen} onClose={setIsCommandOpen} />
+      <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
 
       <Sidebar />
 

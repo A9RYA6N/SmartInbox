@@ -211,7 +211,7 @@ export const AdminUsersPage = () => {
               <div className="h-[400px] flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
               </div>
-            ) : (
+            ) : users.length > 0 ? (
               <div className="divide-y divide-slate-100">
                 {users.map((u, i) => (
                   <motion.div 

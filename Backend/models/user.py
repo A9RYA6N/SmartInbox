@@ -47,8 +47,9 @@ class User(Base):
     )
 
     # Relationships
-    messages:    Mapped[list["SMSMessage"]]  = relationship("SMSMessage",  back_populates="owner",  lazy="select")
-    predictions: Mapped[list["Prediction"]]  = relationship("Prediction",  back_populates="user",   lazy="select")
+    messages:    Mapped[list["SMSMessage"]]  = relationship("SMSMessage",  back_populates="owner",       cascade="all, delete-orphan")
+    predictions: Mapped[list["Prediction"]]  = relationship("Prediction",  back_populates="user",        cascade="all, delete-orphan")
+    notifications: Mapped[list["Notification"]] = relationship("Notification", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email} role={self.role}>"

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { 
-  ShieldCheck, 
-  Activity, 
-  Clock, 
-  Zap, 
-  Lock, 
+import {
+  ShieldCheck,
+  Activity,
+  Clock,
+  Zap,
+  Lock,
   ChevronRight,
   Shield,
   Search,
@@ -62,13 +62,13 @@ export const LandingPage = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => navigate("/login")}
             className="px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-slate-900 transition-colors"
           >
             Agent Login
           </button>
-          <button 
+          <button
             onClick={() => navigate("/register")}
             className="btn-premium flex items-center gap-2 group"
           >
@@ -92,7 +92,7 @@ export const LandingPage = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
               </span>
-              Neural Core Online • v4.2.0
+              Neural Core Online •
             </div>
 
             <h1 className="text-7xl md:text-8xl font-black tracking-tighter leading-[0.85] text-slate-900">
@@ -101,27 +101,10 @@ export const LandingPage = () => {
             </h1>
 
             <p className="text-slate-500 text-xl font-medium leading-relaxed max-w-xl">
-              Advanced neural interceptors designed to identify, isolate, and eliminate malicious SMS traffic before it reaches your inbox. 
+              Advanced neural interceptors designed to identify, isolate, and eliminate malicious SMS traffic before it reaches your inbox.
             </p>
 
-            <form onSubmit={handleStart} className="flex flex-col sm:flex-row gap-4 pt-4">
-              <div className="relative flex-1 max-w-md group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
-                <input 
-                  type="email" 
-                  placeholder="Enter corporate ID"
-                  className="w-full pl-12 pr-4 h-16 rounded-2xl border border-slate-200 bg-white/80 backdrop-blur focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 shadow-xl shadow-slate-200/50 transition-all text-sm font-bold"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <button 
-                type="submit"
-                className="h-16 px-10 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/20 hover:bg-slate-800 hover:-translate-y-1 active:translate-y-0 transition-all"
-              >
-                Start Matrix Scan
-              </button>
-            </form>
+
 
             <div className="flex items-center gap-8 pt-8">
               <div className="flex -space-x-3">
@@ -144,9 +127,9 @@ export const LandingPage = () => {
             className="relative hidden lg:block"
           >
             <div className="absolute inset-0 bg-indigo-500/20 blur-[120px] rounded-full animate-pulse" />
-            <img 
-              src={heroImg} 
-              alt="SmartInbox 3D Shield" 
+            <img
+              src={heroImg}
+              alt="SmartInbox 3D Shield"
               className="relative w-full drop-shadow-[0_35px_35px_rgba(79,70,229,0.15)] animate-float"
             />
           </motion.div>
@@ -162,39 +145,39 @@ export const LandingPage = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard 
-              icon={Shield} 
-              title="Neural Intercept" 
+            <FeatureCard
+              icon={Shield}
+              title="Neural Intercept"
               description="Real-time message filtering using state-of-the-art transformer models with 99.9% detection accuracy."
               delay={0.1}
             />
-            <FeatureCard 
-              icon={BarChart3} 
-              title="Threat Analytics" 
+            <FeatureCard
+              icon={BarChart3}
+              title="Threat Analytics"
               description="Visualise spam trends and attack vectors through our high-performance D3-powered dashboard."
               delay={0.2}
             />
-            <FeatureCard 
-              icon={Cpu} 
-              title="Sub-15ms Latency" 
+            <FeatureCard
+              icon={Cpu}
+              title="Sub-15ms Latency"
               description="Optimized inference pipeline ensures that your protection never slows down your communication."
               delay={0.3}
             />
-            <FeatureCard 
-              icon={Layers} 
-              title="Batch Telemetry" 
+            <FeatureCard
+              icon={Layers}
+              title="Batch Telemetry"
               description="Upload large datasets for historical analysis and threat pattern recognition in seconds."
               delay={0.4}
             />
-            <FeatureCard 
-              icon={Lock} 
-              title="Zero-Knowledge" 
+            <FeatureCard
+              icon={Lock}
+              title="Zero-Knowledge"
               description="Your data is encrypted end-to-end. Our models analyze patterns, not identities."
               delay={0.5}
             />
-            <FeatureCard 
-              icon={Activity} 
-              title="Real-time Alerts" 
+            <FeatureCard
+              icon={Activity}
+              title="Real-time Alerts"
               description="Instant security notifications when malicious activity spikes are detected on your account."
               delay={0.6}
             />
@@ -204,7 +187,7 @@ export const LandingPage = () => {
 
       {/* CTA Section */}
       <section className="py-32 px-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -217,7 +200,7 @@ export const LandingPage = () => {
               Join the thousands of users protecting their mobile identity with the world's most advanced neural SMS filter.
             </p>
             <div className="flex justify-center pt-8">
-              <button 
+              <button
                 onClick={() => navigate("/register")}
                 className="bg-white text-slate-900 px-12 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-indigo-50 hover:-translate-y-1 transition-all"
               >
@@ -235,7 +218,7 @@ export const LandingPage = () => {
             <Zap className="w-5 h-5 text-slate-900" />
             <span className="font-black text-xl tracking-tighter text-slate-900">SmartInbox</span>
           </div>
-          
+
           <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
             <a href="#" className="hover:text-slate-900 transition-colors">Documentation</a>
             <a href="#" className="hover:text-slate-900 transition-colors">API Reference</a>
@@ -252,19 +235,19 @@ export const LandingPage = () => {
 };
 
 const Mail = ({ size, className }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={className}
   >
-    <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    <rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
 );
 
