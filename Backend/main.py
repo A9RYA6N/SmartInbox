@@ -176,13 +176,21 @@ app.add_middleware(
     allow_headers     = ["*"],
 )
 
-# ── Routers ───────────────────────────────────────────────────────────────────
+# ── Routers (Standard /api/v1 prefix) ──────────────────────────────────────────
 app.include_router(auth.router,          prefix="/api/v1")
 app.include_router(user.router,          prefix="/api/v1")
 app.include_router(admin.router,         prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
 app.include_router(ws.router,            prefix="/api/v1")
 app.include_router(jobs.router,          prefix="/api/v1")
+
+# ── Routers (Root prefix fallback for deployment flexibility) ──────────────────
+app.include_router(auth.router)
+app.include_router(user.router)
+app.include_router(admin.router)
+app.include_router(notifications.router)
+app.include_router(ws.router)
+app.include_router(jobs.router)
 
 
 # ── Root & health endpoints ───────────────────────────────────────────────────
