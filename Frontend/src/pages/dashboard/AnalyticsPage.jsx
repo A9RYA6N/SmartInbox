@@ -10,6 +10,7 @@ import {
   ShieldAlert,
   Zap,
   RefreshCw,
+  Sparkles,
 } from "lucide-react";
 import { useStore } from "../../store/useStore";
 import { getSpamTrends, getUserStats } from "../../api/spamApi";
@@ -48,6 +49,16 @@ export const AnalyticsPage = () => {
   useEffect(() => {
     fetchAnalytics();
   }, [fetchAnalytics]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1 
+      }
+    }
+  };
 
   const cardVariants = {
     hidden: { opacity: 0, y: 10 },
@@ -163,7 +174,7 @@ export const AnalyticsPage = () => {
               </ResponsiveContainer>
             )}
           </div>
-      </div>
+        </motion.div>
 
       {/* Threat Distribution */}
       <motion.div variants={cardVariants} className="minimal-card p-6 flex flex-col">
@@ -267,9 +278,8 @@ export const AnalyticsPage = () => {
           </div>
         </div>
       </motion.div>
-
     </div>
-    </div >
-  );
+  </motion.div>
+);
 };
 
