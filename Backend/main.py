@@ -223,7 +223,10 @@ async def health_check(request: Request):
     from app.services.ml_service import _detector
 
     # ML health
+    from app.services.ml_service import get_ml_error
     ml_health = _detector.health() if _detector else {"status": "not_loaded"}
+    if ml_health.get("status") == "not_loaded":
+        ml_health["error"] = get_ml_error()
 
     # DB health (simple connectivity check)
     from app.database import AsyncSessionLocal

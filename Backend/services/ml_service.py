@@ -50,6 +50,7 @@ def translate_ml_error(exc: Exception) -> HTTPException:
 
 # ── Module-level singleton (loaded once at startup) ───────────────────────────
 _detector: Optional[SpamDetectorService] = None
+_last_error: Optional[str] = None
 
 
 def init_spam_detector() -> SpamDetectorService:
@@ -110,7 +111,13 @@ def init_spam_detector() -> SpamDetectorService:
         detector._load()
         logger.info(f"[ML] Model {tag} loaded successfully.")
     except Exception as e:
+        global _last_error
+        _last_error = str(e)
         logger.error(f"[ML] ERROR: Failed to load model: {e}")
     
     _detector = detector
     return _detector
+
+
+def get_ml_error() -> Optional[str]:
+    return _last_error
