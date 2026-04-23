@@ -16,7 +16,7 @@ import {
   Layers,
   History
 } from "lucide-react";
-import { predictBatchCSV } from "../../api/spamApi";
+import { predictBatchCSV, getJobStatus } from "../../api/spamApi";
 import { toast } from "react-hot-toast";
 
 const MAX_FILE_SIZE_MB = 5;

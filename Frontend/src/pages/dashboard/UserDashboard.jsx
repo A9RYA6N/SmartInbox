@@ -37,7 +37,7 @@ export const UserDashboard = () => {
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["userStats"],
-    queryFn: getUserStats,
+    queryFn: () => getUserStats(),
   });
 
   const { data: trendsData, isLoading: trendsLoading } = useQuery({

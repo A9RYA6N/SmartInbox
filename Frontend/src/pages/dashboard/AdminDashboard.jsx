@@ -65,7 +65,7 @@ export const AdminDashboard = () => {
 
   const { data: importanceData, isLoading: importanceLoading } = useQuery({
     queryKey: ["featureImportance"],
-    queryFn: getFeatureImportance,
+    queryFn: () => getFeatureImportance(20),
   });
 
   const { data: quickStats, isLoading: statsLoading } = useQuery({
