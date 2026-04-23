@@ -148,6 +148,18 @@ class SpamDetectorService:
         if "logger" not in sys.modules["__main__"].__dict__:
             sys.modules["__main__"].logger = logger
 
+        # 2. Fix scikit-learn version mismatch (MaxAbsScaler 'clip' error)
+        try:
+            from sklearn.preprocessing import MaxAbsScaler
+            if not hasattr(MaxAbsScaler, "clip"):
+                # If the class itself doesn't have 'clip' (older version), 
+                # add it as a class-level default to avoid AttributeError 
+                # on instances unpickled from newer versions.
+                MaxAbsScaler.clip = False
+                logger.info("[ML] Applied MaxAbsScaler.clip monkeypatch for compatibility.")
+        except Exception as patch_exc:
+            logger.debug(f"[ML] Monkeypatch failed: {patch_exc}")
+
         try:
             with open(pipeline_path, "rb") as f:
                 self._pipeline = pickle.load(f)
