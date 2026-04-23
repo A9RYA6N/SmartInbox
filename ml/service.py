@@ -102,7 +102,7 @@ class SpamDetectorService:
 
         import os
         logger.info(f"[ML-DEBUG] Current Working Directory: {os.getcwd()}")
-        logger.info(f"[ML-DEBUG] Expected ML Dir: {_ML_DIR}")
+        logger.info(f"[ML-DEBUG] Expected ML Dir: {_ML_ROOT}")
         logger.info(f"[ML-DEBUG] Expected Models Dir: {_MODELS_DIR}")
         logger.info(f"[ML-DEBUG] Expected Artifacts Dir: {_ARTIFACTS_DIR}")
         
