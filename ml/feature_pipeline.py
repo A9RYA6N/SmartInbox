@@ -32,8 +32,25 @@ init_nltk()
 logger = logging.getLogger("ml.feature_pipeline")
 
 _PUNCT_TABLE = str.maketrans('', '', '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
-_LEMMATIZER = WordNetLemmatizer()
-_STOP_WORDS = set(stopwords.words("english"))
+_STOP_WORDS = None
+
+def get_stop_words():
+    global _STOP_WORDS
+    if _STOP_WORDS is None:
+        try:
+            _STOP_WORDS = set(stopwords.words("english"))
+        except LookupError:
+            logger.warning("[NLTK] Stopwords not found. Using empty set.")
+            _STOP_WORDS = set()
+    return _STOP_WORDS
+
+_LEMMATIZER = None
+
+def get_lemmatizer():
+    global _LEMMATIZER
+    if _LEMMATIZER is None:
+        _LEMMATIZER = WordNetLemmatizer()
+    return _LEMMATIZER
 
 # Text cleaning functions 
 def clean_text(text: str) -> str:
@@ -46,10 +63,12 @@ def clean_text(text: str) -> str:
 def tokenize_and_lemmatize(text: str) -> List[str]:
     """Tokenise → remove stopwords → lemmatise."""
     tokens = word_tokenize(text)
+    lemmatizer = get_lemmatizer()
+    stop_words = get_stop_words()
     return [
-        _LEMMATIZER.lemmatize(tok)
+        lemmatizer.lemmatize(tok)
         for tok in tokens
-        if tok not in _STOP_WORDS and tok.isalpha()
+        if tok not in stop_words and tok.isalpha()
     ]
 
 def preprocess_text(text: str) -> str:
