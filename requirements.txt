@@ -25,6 +25,8 @@ python-dotenv>=1.0.0             # .env file loading fallback
 pydantic>=2.7.0
 pydantic-settings>=2.3.0
 email-validator>=2.1.0           # EmailStr support
+requests>=2.31.0
+
 
 # ── ML -------------------------------------------------------------------
 scikit-learn>=1.4.0

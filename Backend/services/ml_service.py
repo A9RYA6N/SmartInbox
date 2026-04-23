@@ -24,7 +24,11 @@ if str(_ML_DIR) not in sys.path:
     sys.path.insert(0, str(_ML_DIR))
 
 # These imports resolve from ml/
+import sys
+import os
+import requests
 from service import SpamDetectorService, ServiceError, InvalidInputError, ModelNotLoadedError  # noqa: E402
+
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -40,10 +44,31 @@ def init_spam_detector() -> SpamDetectorService:
     """
     global _detector
     if _detector is None:
-        _detector = SpamDetectorService(
+        model_url = os.environ.get("MODEL_URL")
+        detector = SpamDetectorService(
             model_version=settings.MODEL_VERSION,
-            auto_load=True,
+            auto_load=False, # We load manually to handle potential download
         )
+        
+        # Ensure model exists or download it
+        tag = settings.MODEL_VERSION
+        model_path = _ML_DIR / "models" / f"model_{tag}.pkl"
+        
+        if not model_path.exists() and model_url:
+            print(f"[ML] Model missing. Downloading from {model_url}...")
+            try:
+                os.makedirs(model_path.parent, exist_ok=True)
+                response = requests.get(model_url, stream=True)
+                response.raise_for_status()
+                with open(model_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                print(f"[ML] Download complete: {model_path}")
+            except Exception as e:
+                print(f"[ML] Download failed: {e}")
+        
+        detector._load()
+        _detector = detector
     return _detector
 
 
