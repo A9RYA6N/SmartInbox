@@ -9,6 +9,7 @@ Docs:   http://localhost:8000/docs   (Swagger UI)
 """
 
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -168,6 +169,30 @@ if _rate_limit_available and limiter:
 app.add_middleware(GZipMiddleware, minimum_size=500)
 app.add_middleware(GlobalExceptionMiddleware)
 app.add_middleware(RequestLoggingMiddleware)
+
+# ── Health Check & Root ───────────────────────────────────────────────────────
+@app.get("/", tags=["System"])
+async def root():
+    """Root endpoint for health checks and API identification."""
+    return {
+        "status": "online",
+        "service": "SmartInbox API",
+        "version": settings.APP_VERSION,
+        "docs": "/docs"
+    }
+
+@app.get("/health", tags=["System"])
+async def health_check():
+    """Detailed health check for load balancers."""
+    from app.services.ml_service import get_ml_error, init_spam_detector
+    detector = init_spam_detector()
+    return {
+        "status": "healthy" if detector._loaded else "degraded",
+        "ml_loaded": detector._loaded,
+        "ml_version": detector._model_version,
+        "ml_error": get_ml_error(),
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 # ── CORS (Must be outermost layer so it adds headers even to 500 errors) ──────
 app.add_middleware(

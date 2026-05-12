@@ -23,6 +23,12 @@ import time
 import pickle
 import logging
 from datetime import datetime, timezone
+import warnings
+try:
+    from sklearn.exceptions import InconsistentVersionWarning
+    warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
+except ImportError:
+    pass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
