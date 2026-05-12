@@ -10,11 +10,10 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
-class RegisterRequest(BaseModel):
+class UserRegisterRequest(BaseModel):
     email:    EmailStr       = Field(..., examples=["alice@example.com"])
     username: str            = Field(..., min_length=3, max_length=80, examples=["alice"])
     password: str            = Field(..., min_length=8, max_length=128)
-    admin_key: str           = Field(default="", examples=[""])
 
     @field_validator("password")
     @classmethod
@@ -31,6 +30,11 @@ class RegisterRequest(BaseModel):
         if not all(c.isalnum() or c in "_-" for c in v):
             raise ValueError("Username must be alphanumeric (underscores/hyphens allowed).")
         return v.lower()
+
+
+class AdminRegisterRequest(UserRegisterRequest):
+    admin_key: str = Field(..., description="Secret key to authorize admin registration")
+
 
 
 class LoginRequest(BaseModel):
