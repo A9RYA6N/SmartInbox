@@ -20,7 +20,7 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging, get_logger
 from app.database import create_tables
 from app.middleware import GlobalExceptionMiddleware, RequestLoggingMiddleware
-from app.routers import admin, auth, user, notifications, ws, jobs
+from app.routers import admin, user_auth, admin_auth, user, notifications, ws, jobs
 from app.services.ml_service import init_spam_detector
 
 settings = get_settings()
@@ -148,7 +148,7 @@ trained ML pipeline with TF-IDF + feature engineering.
 
 ### Authentication
 All prediction endpoints require a valid JWT.
-Use `/auth/login` to obtain a token, then include it as:
+Use `/auth/user/login` or `/auth/admin/login` to obtain a token, then include it as:
 ```
 Authorization: Bearer <access_token>
 ```
@@ -179,7 +179,9 @@ app.add_middleware(
 )
 
 # ── Routers (Standard /api/v1 prefix) ──────────────────────────────────────────
-app.include_router(auth.router,          prefix="/api/v1")
+# ── Routers (Standard /api/v1 prefix) ──────────────────────────────────────────
+app.include_router(user_auth.router,     prefix="/api/v1")
+app.include_router(admin_auth.router,    prefix="/api/v1")
 app.include_router(user.router,          prefix="/api/v1")
 app.include_router(admin.router,         prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
@@ -187,12 +189,14 @@ app.include_router(ws.router,            prefix="/api/v1")
 app.include_router(jobs.router,          prefix="/api/v1")
 
 # ── Routers (Root prefix fallback for deployment flexibility) ──────────────────
-app.include_router(auth.router)
+app.include_router(user_auth.router)
+app.include_router(admin_auth.router)
 app.include_router(user.router)
 app.include_router(admin.router)
 app.include_router(notifications.router)
 app.include_router(ws.router)
 app.include_router(jobs.router)
+
 
 
 # ── Root & health endpoints ───────────────────────────────────────────────────
