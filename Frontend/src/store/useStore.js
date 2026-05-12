@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { axiosClient } from '../api/axiosClient';
-import { loginUser, getMe } from '../api/authApi';
+import { loginUser, loginAdmin, getMe, getAdminMe } from '../api/authApi';
 
 export const useStore = create((set, get) => ({
   // Auth State
@@ -48,7 +48,14 @@ export const useStore = create((set, get) => ({
 
   fetchProfile: async () => {
     try {
-      const res = await axiosClient.get('/auth/me');
+      // First try user profile
+      let res;
+      try {
+        res = await axiosClient.get('/auth/user/me');
+      } catch {
+        // If that fails, try admin profile
+        res = await axiosClient.get('/auth/admin/me');
+      }
       set({ user: res.data, isLoading: false });
       return res.data;
     } catch (err) {
@@ -92,9 +99,10 @@ export const useStore = create((set, get) => ({
     });
   },
 
-  login: async (email, password) => {
+  login: async (email, password, isAdmin = false) => {
     try {
-      const data = await loginUser({ email, password });
+      const loginFn = isAdmin ? loginAdmin : loginUser;
+      const data = await loginFn({ email, password });
       get().setAuth(data, null);
       const profile = await get().fetchProfile();
       if (profile) get().prefetchDashboard();

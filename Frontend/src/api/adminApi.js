@@ -10,9 +10,9 @@ import { axiosClient } from "./axiosClient";
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
-/** POST /admin/login – dedicated admin login endpoint */
+/** POST /auth/admin/login – dedicated admin login endpoint */
 export const adminLogin = async ({ email, password }) => {
-  const { data } = await axiosClient.post("/admin/login", { email, password });
+  const { data } = await axiosClient.post("/auth/admin/login", { email, password });
   return data;
 };
 
