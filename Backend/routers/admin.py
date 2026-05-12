@@ -116,7 +116,7 @@ async def _audit(
         logger.warning("Audit log write failed (non-fatal): %s", exc)
 
 
-# ── Admin Endpoints ───────────────────────────────────────────────────────────
+
 
 
 # ── GET /admin/dashboard ──────────────────────────────────────────────────────

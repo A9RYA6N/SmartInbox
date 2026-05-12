@@ -1,84 +1,62 @@
 """
 app/routers/admin_auth.py
 -------------------------
-Dedicated authentication router for administrators.
-Enforces role=admin checks during login and provides specific admin session tokens.
+Authentication router for Administrators.
 """
 
-from datetime import datetime, timezone
-from typing import Any, Dict
+from fastapi import APIRouter, status
 
-from fastapi import APIRouter, HTTPException, status
-from sqlalchemy import select
-
-from app.auth.dependencies import DBSession
-from app.auth.jwt_handler import create_access_token, create_refresh_token
-from app.auth.password import verify_password
-from app.core.logging import get_logger
-from app.models.user import User, UserRole
+from app.auth.dependencies import CurrentUser, DBSession, AdminUser
+from app.schemas.auth import AdminRegisterRequest, LoginRequest, RefreshRequest, TokenResponse, UserOut
+from app.services.auth_service import login_admin, refresh_access_token, register_admin
 
 router = APIRouter(prefix="/auth/admin", tags=["Admin Authentication"])
-logger = get_logger("router.admin_auth")
+
+
+@router.post(
+    "/register",
+    response_model=UserOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register a new admin account",
+)
+async def register(req: AdminRegisterRequest, db: DBSession) -> UserOut:
+    """
+    Create a new admin account. Requires a valid **admin_key**.
+    """
+    user = await register_admin(db, req)
+    return UserOut.model_validate(user)
 
 
 @router.post(
     "/login",
-    status_code=status.HTTP_200_OK,
-    summary="[Admin] Dedicated admin login – validates role=admin",
+    response_model=TokenResponse,
+    summary="Admin Login",
 )
-async def admin_login(
-    req: Dict[str, str],
-    db:  DBSession,
-) -> Dict[str, Any]:
+async def login(req: LoginRequest, db: DBSession) -> TokenResponse:
     """
-    Admin-specific login that:
-    - Validates email + password
-    - Ensures role == 'admin'
-    - Issues JWT with sub=admin_id, role='admin'
-    - Returns access + refresh tokens
+    Authenticate an admin and receive JWT tokens.
+    Only users with role='admin' can log in here.
     """
-    email    = req.get("email", "").strip().lower()
-    password = req.get("password", "")
+    return await login_admin(db, req)
 
-    if not email or not password:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="email and password are required.",
-        )
 
-    user = (await db.execute(select(User).where(User.email == email))).scalar_one_or_none()
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    summary="Refresh Admin Access Token",
+)
+async def refresh(req: RefreshRequest, db: DBSession) -> TokenResponse:
+    """
+    Exchange a valid refresh token for a new pair of tokens.
+    """
+    return await refresh_access_token(db, req.refresh_token)
 
-    if not user or not verify_password(password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password.",
-        )
 
-    if user.role != UserRole.admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied: admin role required.",
-        )
-
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin account is deactivated.",
-        )
-
-    # Issue tokens
-    access_token  = create_access_token(str(user.id), role="admin")
-    refresh_token = create_refresh_token(str(user.id))
-
-    # Update last login
-    user.last_login = datetime.now(timezone.utc)
-    await db.commit()
-
-    logger.info("Admin login │ email=%s │ id=%s", user.email, user.id)
-
-    return {
-        "access_token":  access_token,
-        "refresh_token": refresh_token,
-        "token_type":    "bearer",
-        "role":          "admin",
-    }
+@router.get(
+    "/me",
+    response_model=UserOut,
+    summary="Get current admin profile",
+)
+async def get_me(admin: AdminUser) -> UserOut:
+    """Return the profile of the currently authenticated admin."""
+    return UserOut.model_validate(admin)
