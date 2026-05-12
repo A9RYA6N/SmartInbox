@@ -71,7 +71,13 @@ export const LandingPage = () => {
               onClick={() => navigate("/login")}
               className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 hover:text-slate-900 transition-colors"
             >
-              Agent Login
+              Login
+            </button>
+            <button
+              onClick={() => navigate("/admin/login")}
+              className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600 hover:text-indigo-700 transition-colors border-l border-slate-200 pl-6"
+            >
+              Admin Portal
             </button>
             <button
               onClick={() => navigate("/register")}
@@ -297,6 +303,7 @@ export const LandingPage = () => {
           <div className="flex gap-8 text-xs font-bold uppercase tracking-widest text-slate-500">
             <a href="#" className="hover:text-slate-900 transition-colors">Documentation</a>
             <a href="#" className="hover:text-slate-900 transition-colors">API</a>
+            <button onClick={() => navigate("/admin/login")} className="text-indigo-600 hover:text-indigo-700 transition-colors">Admin Gateway</button>
             <a href="#" className="hover:text-slate-900 transition-colors">Status</a>
           </div>
 

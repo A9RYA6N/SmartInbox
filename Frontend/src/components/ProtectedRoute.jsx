@@ -14,7 +14,10 @@ export const ProtectedRoute = ({ children, requireAdmin = false }) => {
     );
   }
 
-  if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!user) {
+    const redirectPath = location.pathname.startsWith("/admin") ? "/admin/login" : "/login";
+    return <Navigate to={redirectPath} state={{ from: location }} replace />;
+  }
 
   if (requireAdmin && user.role !== "admin") {
     return <Navigate to="/dashboard" replace />;
