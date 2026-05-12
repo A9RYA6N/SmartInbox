@@ -179,9 +179,8 @@ app.add_middleware(
 )
 
 # ── Routers (Standard /api/v1 prefix) ──────────────────────────────────────────
-# ── Routers (Standard /api/v1 prefix) ──────────────────────────────────────────
-app.include_router(user_auth.router,     prefix="/api/v1")
-app.include_router(admin_auth.router,    prefix="/api/v1")
+app.include_router(user_auth.router,     prefix="/api/v1/auth/user")
+app.include_router(admin_auth.router,    prefix="/api/v1/auth/admin")
 app.include_router(user.router,          prefix="/api/v1")
 app.include_router(admin.router,         prefix="/api/v1")
 app.include_router(notifications.router, prefix="/api/v1")
@@ -189,8 +188,7 @@ app.include_router(ws.router,            prefix="/api/v1")
 app.include_router(jobs.router,          prefix="/api/v1")
 
 # ── Routers (Root prefix fallback for deployment flexibility) ──────────────────
-app.include_router(user_auth.router)
-app.include_router(admin_auth.router)
+# Note: auth routers are kept strictly under /api/v1 to enforce domain isolation
 app.include_router(user.router)
 app.include_router(admin.router)
 app.include_router(notifications.router)

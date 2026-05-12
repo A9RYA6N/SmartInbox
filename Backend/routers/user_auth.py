@@ -10,7 +10,7 @@ from app.auth.dependencies import CurrentUser, DBSession
 from app.schemas.auth import LoginRequest, RefreshRequest, UserRegisterRequest, TokenResponse, UserOut
 from app.services.auth_service import login_user, refresh_access_token, register_user
 
-router = APIRouter(prefix="/auth/user", tags=["User Authentication"])
+router = APIRouter(tags=["User Authentication"])
 
 
 @router.post(

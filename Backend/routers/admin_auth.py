@@ -10,7 +10,7 @@ from app.auth.dependencies import CurrentUser, DBSession, AdminUser
 from app.schemas.auth import AdminRegisterRequest, LoginRequest, RefreshRequest, TokenResponse, UserOut
 from app.services.auth_service import login_admin, refresh_access_token, register_admin
 
-router = APIRouter(prefix="/auth/admin", tags=["Admin Authentication"])
+router = APIRouter(tags=["Admin Authentication"])
 
 
 @router.post(

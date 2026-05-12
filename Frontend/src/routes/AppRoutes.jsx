@@ -79,6 +79,10 @@ export const AppRoutes = () => (
         }
       />
       <Route
+        path="/login/"
+        element={<Navigate to="/login" replace />}
+      />
+      <Route
         path="/register"
         element={
           <PublicOnlyRoute>
@@ -87,6 +91,10 @@ export const AppRoutes = () => (
             </SuspenseLayout>
           </PublicOnlyRoute>
         }
+      />
+      <Route
+        path="/register/"
+        element={<Navigate to="/register" replace />}
       />
       <Route
         path="/admin/login"
@@ -99,6 +107,10 @@ export const AppRoutes = () => (
         }
       />
       <Route
+        path="/admin/login/"
+        element={<Navigate to="/admin/login" replace />}
+      />
+      <Route
         path="/admin/register"
         element={
           <PublicOnlyRoute>
@@ -107,6 +119,10 @@ export const AppRoutes = () => (
             </SuspenseLayout>
           </PublicOnlyRoute>
         }
+      />
+      <Route
+        path="/admin/register/"
+        element={<Navigate to="/admin/register" replace />}
       />
 
       <Route
