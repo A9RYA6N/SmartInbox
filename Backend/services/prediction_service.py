@@ -111,6 +111,9 @@ async def process_prediction_job(
                     "feature_importance":          ml_result.get("feature_importance", []),
                 }
             )
+            # Invalidate cache
+            cache_manager.delete(f"stats_{user.id}")
+            cache_manager.delete(f"trends_{user.id}_7")
     except Exception as e:
         logger.error(f"Prediction job {job_id} failed: {e}\n{traceback.format_exc()}")
         job_service.update_job(job_id, status=JobStatus.FAILED, error=str(e))
@@ -199,6 +202,9 @@ async def process_batch_job(
                 "summary": f"Processed {len(flattened)} messages ({spam_count} spam, {ham_count} ham)."
             }
         )
+        # Invalidate cache
+        cache_manager.delete(f"stats_{user.id}")
+        cache_manager.delete(f"trends_{user.id}_7")
         
     except Exception as e:
         logger.error(f"Batch job {job_id} failed: {e}\n{traceback.format_exc()}")
@@ -442,8 +448,6 @@ async def get_user_stats(
     cached = cache_manager.get(cache_key)
     if cached: return cached
 
-    # Run queries in parallel
-    import asyncio
     stmt = select(
         func.count().label("total"),
         func.sum(func.cast(Prediction.is_spam, Integer)).label("spam_count"),
@@ -455,10 +459,9 @@ async def get_user_stats(
         func.sum(func.cast(Prediction.is_spam, Integer)).label("spam_count"),
     ).where(Prediction.user_id == user.id).where(Prediction.predicted_at >= since_24h)
 
-    res_task = db.execute(stmt)
-    res_24h_task = db.execute(stmt_24h)
-    
-    res_out, res_24h_out = await asyncio.gather(res_task, res_24h_task)
+    # Run queries sequentially (AsyncSession does not support concurrent execution)
+    res_out = await db.execute(stmt)
+    res_24h_out = await db.execute(stmt_24h)
     
     res = res_out.one()
     res_24h = res_24h_out.one()
@@ -480,6 +483,7 @@ async def get_user_stats(
     data = {
         "total_scanned": total,
         "spam_blocked":  spam,
+        "ham_verified":  total - spam,
         "threat_level":  threat,
         "trends": {
             "total": f"+{total_24h}" if total_24h > 0 else "0",

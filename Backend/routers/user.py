@@ -322,61 +322,89 @@ async def export_history(
 
 @router.post(
     "/analyze-ai-spam",
-    status_code=status.HTTP_200_OK,
     response_model=AiSpamAnalysisResponse,
-    summary="Deep hybrid AI spam analysis (synchronous full pipeline)",
+    summary="Deep hybrid analysis (Synchronous)",
 )
 async def analyze_ai_spam(
-    body:         AiSpamAnalysisRequest,
+    req:          AiSpamAnalysisRequest,
     current_user: CurrentUser,
+    db:           DBSession,
     ml:           MLService,
-) -> Dict[str, Any]:
+):
     """
-    Run the **full 4-layer hybrid pipeline** synchronously:
-    - Layer 1: ML ensemble (RF + XGB + LightGBM + NB + LR)
-    - Layer 2: Groq LLM semantic analysis
-    - Layer 3: Heuristic + threat intelligence
-    - Layer 4: Weighted ensemble decision
-
-    Returns the complete intelligence report immediately (no job queue).
+    Perform full 4-layer hybrid analysis synchronously.
+    This includes Groq LLM semantic analysis and heuristic risk matrix.
     """
-    text = body.text.strip()
-
-    text = text.strip()
-    if not text:
-        raise HTTPException(status_code=400, detail="text must not be empty.")
-    if len(text) > 2000:
-        raise HTTPException(status_code=400, detail="text exceeds 2000 characters.")
-
-    start_t = time.perf_counter()
     try:
-        result = ml.predict(text)
-    except Exception as exc:
-        raise translate_ml_error(exc)
-    latency_ms = round((time.perf_counter() - start_t) * 1000, 2)
+        start_t = time.perf_counter()
+        
+        logger.info(f"Deep scan initiated │ user={current_user.username} │ text_len={len(req.text)}")
+        
+        try:
+            result = ml.predict(req.text)
+        except Exception as e:
+            logger.error(f"Hybrid analysis failed: {e}")
+            raise translate_ml_error(e)
 
-    return {
-        "text":                       text,
-        "final_prediction":           result.get("final_prediction", "spam" if result["prediction"] == 1 else "ham"),
-        "final_confidence":           result.get("final_confidence", round(result["probability"] * 100, 2)),
-        "threat_level":               result.get("threat_level", "low"),
-        "ml_model_score":             result.get("ml_model_score", round(result["probability"] * 100, 2)),
-        "groq_semantic_score":        result.get("groq_semantic_score", 0.0),
-        "heuristic_score":            result.get("heuristic_score", 0.0),
-        "ai_generated_probability":   result.get("ai_generated_probability", 0.0),
-        "phishing_probability":       result.get("phishing_probability", 0.0),
-        "spam_type":                  result.get("spam_type", "ham"),
-        "spam_type_confidence":       result.get("spam_type_confidence", 0.0),
-        "spam_type_explanation":      result.get("spam_type_explanation", ""),
-        "spam_scores":                result.get("spam_scores", {}),
-        "detected_categories":        result.get("detected_categories", []),
-        "reasoning":                  result.get("reasoning", ""),
-        "recommended_action":         result.get("recommended_action", ""),
-        "feature_importance":         result.get("feature_importance", []),
-        "safe_for_user":              result.get("safe_for_user", result["prediction"] == 0),
-        "groq_available":             result.get("groq_available", False),
-        "latency_ms":                 latency_ms,
-    }
+        latency = (time.perf_counter() - start_t) * 1000
+        result["latency_ms"] = latency
+        
+        # ── PERSIST TO DB ────────────────────────────────────────────────────────
+        # Deep scan should also be saved to history/stats
+        try:
+            logger.info(f"Persisting deep scan for user {current_user.id}...")
+            pred = await store_prediction(
+                db=db,
+                user=current_user,
+                text=req.text,
+                ml_result=result,
+                latency_ms=latency,
+                model_version=ml._model_version
+            )
+            logger.info(f"Prediction stored in session: {pred.id}")
+            await db.commit()
+            logger.info(f"COMMIT SUCCESSFUL for prediction {pred.id}")
+            
+            # Invalidate cache
+            try:
+                from app.services.cache_service import cache_manager
+                cache_manager.delete(f"stats_{current_user.id}")
+                cache_manager.delete(f"trends_{current_user.id}_7")
+                logger.info(f"Cache invalidated for user {current_user.id}")
+            except Exception as cache_err:
+                logger.warning(f"Cache invalidation failed (non-critical): {cache_err}")
+            
+        except Exception as e:
+            logger.error(f"Persistence failed for deep scan: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+
+        return AiSpamAnalysisResponse(
+            text=req.text,
+            final_prediction=result["final_prediction"],
+            final_confidence=result["final_confidence"],
+            threat_level=result["threat_level"],
+            ml_model_score=result["ml_model_score"],
+            groq_semantic_score=result["groq_semantic_score"],
+            heuristic_score=result["heuristic_score"],
+            ai_generated_probability=result["ai_generated_probability"],
+            phishing_probability=result["phishing_probability"],
+            spam_type=result["spam_type"],
+            spam_type_confidence=result["spam_type_confidence"],
+            spam_type_explanation=result["spam_type_explanation"],
+            detected_categories=result["detected_categories"],
+            reasoning=result["reasoning"],
+            recommended_action=result["recommended_action"],
+            feature_importance=result["feature_importance"],
+            safe_for_user=result["safe_for_user"],
+            groq_available=result["groq_available"],
+            latency_ms=latency
+        )
+    except Exception as global_exc:
+        logger.error(f"FATAL ERROR in analyze_ai_spam: {global_exc}")
+        if isinstance(global_exc, HTTPException):
+            raise global_exc
+        raise HTTPException(status_code=500, detail=str(global_exc))
 
 
 # ── GET /user/threat-report ───────────────────────────────────────────────────
@@ -494,3 +522,12 @@ async def threat_report(
     }
     cache_manager.set(cache_key, report, ttl=120)
     return report
+
+
+@router.post("/clear-cache")
+async def clear_user_cache(current_user: CurrentUser):
+    """Manually clear the analytics cache for the current user."""
+    from app.services.cache_service import cache_manager
+    cache_manager.delete(f"stats_{current_user.id}")
+    cache_manager.delete(f"trends_{current_user.id}_7")
+    return {"message": "Cache cleared."}

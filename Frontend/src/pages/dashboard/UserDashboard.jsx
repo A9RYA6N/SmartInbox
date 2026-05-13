@@ -35,8 +35,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const CompactStat = memo(({ label, value, trend, icon: Icon, color }) => (
-  <div className="flex items-center gap-4 p-5 bg-white border border-zinc-200 rounded-2xl transition-all">
-    <div className={`p-2 rounded-lg bg-zinc-50 text-zinc-900 border border-zinc-100`}>
+  <div className="flex items-center gap-4 p-5 bg-white border border-zinc-200 rounded-2xl hover:shadow-sm transition-all group">
+    <div className={`p-2 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-all`}>
       <Icon size={18} />
     </div>
     <div>
@@ -44,7 +44,7 @@ const CompactStat = memo(({ label, value, trend, icon: Icon, color }) => (
       <div className="flex items-center gap-2">
         <span className="text-lg font-bold text-zinc-900">{value}</span>
         {trend && (
-          <span className="text-[9px] font-bold text-zinc-900 bg-zinc-50 px-1.5 py-0.5 rounded-md border border-zinc-100">
+          <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-100">
             {trend}
           </span>
         )}
@@ -55,14 +55,14 @@ const CompactStat = memo(({ label, value, trend, icon: Icon, color }) => (
 
 const ThreatBadge = ({ level }) => {
   const cfg = {
-    critical: "bg-zinc-900 text-white",
-    high: "bg-zinc-100 text-zinc-900",
-    medium: "bg-zinc-50 text-zinc-600",
-    low: "bg-zinc-50 text-zinc-400",
+    critical: "bg-rose-50 text-rose-600 border-rose-100",
+    high: "bg-amber-50 text-amber-600 border-amber-100",
+    medium: "bg-indigo-50 text-indigo-600 border-indigo-100",
+    low: "bg-emerald-50 text-emerald-600 border-emerald-100",
   };
   const style = cfg[level?.toLowerCase()] || cfg.low;
   return (
-    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${style}`}>
+    <span className={`px-2 py-0.5 border rounded text-[9px] font-bold uppercase tracking-wider ${style}`}>
       {level || "Low"}
     </span>
   );
@@ -105,19 +105,35 @@ export const UserDashboard = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => navigate("/scan")}
-          className="bg-zinc-900 text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-xl hover:bg-zinc-800 transition-all"
-        >
-          New Analysis
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              const { axiosClient } = await import("../../api/axiosClient");
+              try {
+                await axiosClient.post("/user/clear-cache");
+                window.location.reload();
+              } catch (err) {
+                console.error("Sync failed", err);
+              }
+            }}
+            className="flex items-center gap-2 px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-[10px] font-bold text-zinc-600 uppercase tracking-wider hover:bg-zinc-100 transition-all"
+          >
+            <Activity size={14} /> Sync
+          </button>
+          <button
+            onClick={() => navigate("/scan")}
+            className="bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-wider px-6 py-3 rounded-xl hover:bg-zinc-800 transition-all"
+          >
+            New Analysis
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <CompactStat label="Scanned" value={stats.total_scanned.toLocaleString()} trend={stats.trends.total !== "0" ? stats.trends.total : null} icon={TrendingUp} />
-        <CompactStat label="Blocked" value={stats.spam_blocked.toLocaleString()} trend={stats.trends.spam !== "0" ? stats.trends.spam : null} icon={ShieldCheck} />
+        <CompactStat label="Scanned" value={stats.total_scanned.toLocaleString()} icon={TrendingUp} />
+        <CompactStat label="Blocked" value={stats.spam_blocked.toLocaleString()} icon={ShieldCheck} />
+        <CompactStat label="Verified" value={(stats.ham_verified || 0).toLocaleString()} icon={Zap} />
         <CompactStat label="Threat" value={stats.threat_level} icon={AlertTriangle} />
-        <CompactStat label="Accuracy" value="99.1%" icon={Brain} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

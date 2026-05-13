@@ -1,5 +1,5 @@
 import React, { useState, memo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, 
@@ -51,9 +51,15 @@ const SidebarItem = memo(({ icon: Icon, label, path, active, collapsed }) => {
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const user = useStore((state) => state.user);
   const logout = useStore((state) => state.logout);
   const isAdmin = user?.role === "admin";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
 
   const mainNav = [
     { label: "Dashboard",    path: "/dashboard",  icon: LayoutDashboard },
@@ -156,7 +162,7 @@ export const Sidebar = () => {
         </div>
         
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="w-full mt-4 flex items-center gap-3 p-3 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all group"
         >
           <LogOut size={16} className="group-hover:translate-x-0.5 transition-transform" />

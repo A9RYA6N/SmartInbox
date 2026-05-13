@@ -15,7 +15,7 @@ export const ProtectedRoute = ({ children, requireAdmin = false }) => {
   }
 
   if (!user) {
-    const redirectPath = location.pathname.startsWith("/admin") ? "/admin/login" : "/login";
+    const redirectPath = location.pathname.startsWith("/admin") ? "/admin/login" : "/";
     return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
 

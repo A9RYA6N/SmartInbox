@@ -36,9 +36,9 @@ _ML_WEIGHT_NO_GROQ   = 0.80
 _HEUR_WEIGHT_NO_GROQ = 0.20
 
 # ── Detection Thresholds ───────────────────────────────────────────────────
-_STRICT_THRESHOLD    = 0.50  # Critical
-_NORMAL_THRESHOLD    = 0.15  # High Risk (Spam)
-_HIGH_RISK_THRESHOLD = 0.05  # Medium Risk (Suspicious)
+_STRICT_THRESHOLD    = 0.80  # Critical / Definitive Spam
+_NORMAL_THRESHOLD    = 0.60  # High Risk (Spam)
+_HIGH_RISK_THRESHOLD = 0.45  # Medium Risk (Suspicious)
 
 # ── Heuristic detection patterns (rule-based engine) ─────────────────────────
 
@@ -276,19 +276,7 @@ def hybrid_detect(
             + _HEUR_WEIGHT_NO_GROQ * h_score
         )
 
-    # ── Spam Ratio Amplifier (Aggressive Tuning) ─────────────────────────────
-    # If ML is confident OR heuristics found a strong match, boost significantly
-    is_trad_spam = "traditional_spam" in h_cats
-    
-    if final_score > 0.05:
-        # Boost if ML and Heuristic/Groq agree even slightly
-        if (ml_probability > 0.08 and h_score > 0.08) or (g_score and g_score > 0.08) or is_trad_spam:
-            final_score *= 3.0  # Hyper-aggressive 200% boost
-            if is_trad_spam:
-                final_score = max(final_score, 0.25)
-    
     # ── Final Score Normalization ───────────────────────────────────────────
-    # Removed Binary Polarizer to allow truly variable and proportional scoring.
     final_score = min(max(final_score, 0.0), 1.0)
 
     # ── Determine prediction and threat level ─────────────────────────────────

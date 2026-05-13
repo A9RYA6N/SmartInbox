@@ -95,11 +95,17 @@ export const Login = () => {
           </button>
         </form>
         
-        <div className="mt-10 text-center">
+        <div className="mt-10 space-y-4 text-center">
            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
              Need access? {" "}
              <Link to="/register" className="text-zinc-900 hover:underline transition-colors ml-1">
                Create Identity
+             </Link>
+           </p>
+           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
+             Management? {" "}
+             <Link to="/admin/login" className="text-zinc-900 hover:underline transition-colors ml-1">
+               Admin Portal
              </Link>
            </p>
         </div>

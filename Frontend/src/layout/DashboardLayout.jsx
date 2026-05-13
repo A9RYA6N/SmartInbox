@@ -8,7 +8,13 @@ export const DashboardLayout = memo(() => {
   const location = useLocation();
 
   return (
-    <div className="flex h-screen bg-zinc-50 text-zinc-900 overflow-hidden relative">
+    <div className="flex h-screen bg-white text-zinc-900 overflow-hidden relative">
+      {/* Vibrant Background Decorations */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-5%] right-[-5%] w-[400px] h-[400px] bg-indigo-50/50 rounded-full blur-[80px]" />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] bg-rose-50/30 rounded-full blur-[80px]" />
+      </div>
+      
       <Sidebar />
 
       <main className="flex-1 relative overflow-y-auto no-scrollbar">

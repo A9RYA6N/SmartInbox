@@ -45,7 +45,7 @@ const SmartRedirect = () => {
     if (location.pathname.startsWith("/admin")) {
       return <Navigate to="/admin/login" replace />;
     }
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
   return <Navigate to={user.role === "admin" ? "/admin" : "/dashboard"} replace />;
 };
