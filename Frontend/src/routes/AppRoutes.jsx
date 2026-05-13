@@ -7,25 +7,25 @@ import { useStore } from "../store/useStore";
 import { Spinner } from "../components/ui/Spinner";
 
 // Public pages
-const LandingPage = lazy(() => import("../pages/LandingPage").then(module => ({ default: module.LandingPage })));
-const Login = lazy(() => import("../pages/auth/Login").then(module => ({ default: module.Login })));
-const Register = lazy(() => import("../pages/auth/Register").then(module => ({ default: module.Register })));
-const AdminLogin = lazy(() => import("../pages/auth/AdminLogin").then(module => ({ default: module.AdminLogin })));
-const AdminRegister = lazy(() => import("../pages/auth/AdminRegister").then(module => ({ default: module.AdminRegister })));
+const LandingPage = lazy(() => import("../pages/LandingPage"));
+const Login = lazy(() => import("../pages/auth/Login"));
+const Register = lazy(() => import("../pages/auth/Register"));
+const AdminLogin = lazy(() => import("../pages/auth/AdminLogin"));
+const AdminRegister = lazy(() => import("../pages/auth/AdminRegister"));
 
 // Dashboard pages
-const UserDashboard = lazy(() => import("../pages/dashboard/UserDashboard").then(module => ({ default: module.UserDashboard })));
-const AdminDashboard = lazy(() => import("../pages/dashboard/AdminDashboard").then(module => ({ default: module.AdminDashboard })));
-const ScanPage = lazy(() => import("../pages/dashboard/ScanPage").then(module => ({ default: module.ScanPage })));
-const ResultsPage = lazy(() => import("../pages/dashboard/ResultsPage").then(module => ({ default: module.ResultsPage })));
-const HistoryPage = lazy(() => import("../pages/dashboard/HistoryPage").then(module => ({ default: module.HistoryPage })));
-const AnalyticsPage = lazy(() => import("../pages/dashboard/AnalyticsPage").then(module => ({ default: module.AnalyticsPage })));
-const BatchUploadPage = lazy(() => import("../pages/dashboard/BatchUploadPage").then(module => ({ default: module.BatchUploadPage })));
+const UserDashboard = lazy(() => import("../pages/dashboard/UserDashboard"));
+const AdminDashboard = lazy(() => import("../pages/dashboard/AdminDashboard"));
+const ScanPage = lazy(() => import("../pages/dashboard/ScanPage"));
+const ResultsPage = lazy(() => import("../pages/dashboard/ResultsPage"));
+const HistoryPage = lazy(() => import("../pages/dashboard/HistoryPage"));
+const AnalyticsPage = lazy(() => import("../pages/dashboard/AnalyticsPage"));
+const BatchUploadPage = lazy(() => import("../pages/dashboard/BatchUploadPage"));
 
 // Admin-specific pages
-const AdminUsersPage = lazy(() => import("../pages/dashboard/AdminUsersPage").then(module => ({ default: module.AdminUsersPage })));
-const AdminMessagesPage = lazy(() => import("../pages/dashboard/AdminMessagesPage").then(module => ({ default: module.AdminMessagesPage })));
-const AdminLogsPage = lazy(() => import("../pages/dashboard/AdminLogsPage").then(module => ({ default: module.AdminLogsPage })));
+const AdminUsersPage = lazy(() => import("../pages/dashboard/AdminUsersPage"));
+const AdminMessagesPage = lazy(() => import("../pages/dashboard/AdminMessagesPage"));
+const AdminLogsPage = lazy(() => import("../pages/dashboard/AdminLogsPage"));
 
 const SuspenseLayout = ({ children }) => (
   <Suspense fallback={
@@ -42,7 +42,6 @@ const SmartRedirect = () => {
   const location = useLocation();
 
   if (!user) {
-    // If logging out from admin area, go to admin login
     if (location.pathname.startsWith("/admin")) {
       return <Navigate to="/admin/login" replace />;
     }
@@ -79,10 +78,6 @@ export const AppRoutes = () => (
         }
       />
       <Route
-        path="/login/"
-        element={<Navigate to="/login" replace />}
-      />
-      <Route
         path="/register"
         element={
           <PublicOnlyRoute>
@@ -91,10 +86,6 @@ export const AppRoutes = () => (
             </SuspenseLayout>
           </PublicOnlyRoute>
         }
-      />
-      <Route
-        path="/register/"
-        element={<Navigate to="/register" replace />}
       />
       <Route
         path="/admin/login"
@@ -107,10 +98,6 @@ export const AppRoutes = () => (
         }
       />
       <Route
-        path="/admin/login/"
-        element={<Navigate to="/admin/login" replace />}
-      />
-      <Route
         path="/admin/register"
         element={
           <PublicOnlyRoute>
@@ -119,10 +106,6 @@ export const AppRoutes = () => (
             </SuspenseLayout>
           </PublicOnlyRoute>
         }
-      />
-      <Route
-        path="/admin/register/"
-        element={<Navigate to="/admin/register" replace />}
       />
 
       <Route

@@ -230,26 +230,34 @@ class GroqSpamAnalyzer:
         
         # Robust JSON extraction
         import re
+        # Try to find something wrapped in braces first
         json_match = re.search(r"(\{.*\})", raw_text, re.DOTALL)
+        
         if json_match:
             json_str = json_match.group(1)
-            try:
-                data = json.loads(json_str)
-                # Handle double-encoded JSON strings
-                if isinstance(data, str):
-                    try:
-                        data = json.loads(data)
-                    except:
-                        pass
-                if not isinstance(data, dict):
-                    raise ValueError(f"Decoded JSON is not a dictionary: {type(data)}")
-                return data
-            except Exception as e:
-                logger.error("[Groq] Parsing failed: %s | Match: %s", e, json_str[:100])
-                raise e
         else:
-            logger.error("[Groq] No JSON found in response: %s", raw_text)
-            raise ValueError(f"No JSON found in response: {raw_text[:100]}")
+            # If no braces found, maybe it's raw key-value pairs? 
+            # Try to wrap it in braces if it contains "spam_prediction"
+            if '"spam_prediction"' in raw_text:
+                json_str = "{" + raw_text + "}"
+            else:
+                logger.error("[Groq] No JSON found in response: %s", raw_text)
+                raise ValueError(f"No JSON found in response: {raw_text[:100]}")
+
+        try:
+            data = json.loads(json_str)
+            # Handle double-encoded JSON strings
+            if isinstance(data, str):
+                try:
+                    data = json.loads(data)
+                except:
+                    pass
+            if not isinstance(data, dict):
+                raise ValueError(f"Decoded JSON is not a dictionary: {type(data)}")
+            return data
+        except Exception as e:
+            logger.error("[Groq] Parsing failed: %s | Match: %s", e, json_str[:100])
+            raise e
 
     def analyze(self, text: str) -> GroqResult:
         """

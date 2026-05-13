@@ -288,3 +288,5 @@ export const BatchUploadPage = () => {
   );
 };
 
+
+export default BatchUploadPage;

@@ -26,7 +26,7 @@ export const retrainModel = async (formData) => {
   return data;
 };
 
-export const updateThreshold = async (threshold, reason = "Admin Dashboard Tuning") => {
+export const updateThreshold = async ({ threshold, reason = "Admin Dashboard Tuning" }) => {
   const { data } = await axiosClient.post("/admin/update-threshold", { threshold, reason });
   return data;
 };

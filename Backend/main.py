@@ -7,7 +7,8 @@ Start:  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 Docs:   http://localhost:8000/docs   (Swagger UI)
         http://localhost:8000/redoc  (ReDoc)
 """
-
+import time
+import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
@@ -23,6 +24,7 @@ from app.database import create_tables
 from app.middleware import GlobalExceptionMiddleware, RequestLoggingMiddleware
 from app.routers import admin, user_auth, admin_auth, user, notifications, ws, jobs
 from app.services.ml_service import init_spam_detector
+from fastapi.responses import RedirectResponse
 
 settings = get_settings()
 
@@ -60,32 +62,34 @@ async def lifespan(app: FastAPI):
         settings.ENVIRONMENT, settings.DEBUG, settings.MODEL_VERSION,
     )
 
-    # ── Database Connectivity Check ───────────────────────────────────────────
-    try:
-        from app.database import AsyncSessionLocal
-        from sqlalchemy import text
-        import asyncio
-        
-        connected = False
-        retries = 5
-        while not connected and retries > 0:
-            try:
-                async with AsyncSessionLocal() as session:
-                    await session.execute(text("SELECT 1"))
-                connected = True
-                logger.info("Database connectivity verified. [Neon/Serverless Postgres]")
-            except Exception as e:
-                retries -= 1
-                logger.warning(f"Database connection failed. Retrying in 2s... ({retries} retries left)")
-                await asyncio.sleep(2)
-        
-        if not connected:
-            logger.error("Failed to connect to database after multiple retries. API may be degraded.")
-        else:
-            await create_tables()
-            logger.info("Database schema verified / created.")
-    except Exception as exc:
-        logger.error("Error during database initialization: %s", exc)
+    # ── Database Connectivity Check (Asynchronous) ────────────────────────────
+    async def init_db():
+        try:
+            from app.database import AsyncSessionLocal
+            from sqlalchemy import text
+            
+            connected = False
+            retries = 3
+            while not connected and retries > 0:
+                try:
+                    async with AsyncSessionLocal() as session:
+                        await session.execute(text("SELECT 1"))
+                    connected = True
+                    logger.info("Database connectivity verified. [Neon/Serverless Postgres]")
+                except Exception as e:
+                    retries -= 1
+                    logger.warning(f"Database connection failed. Retrying in 2s... ({retries} retries left)")
+                    await asyncio.sleep(2)
+            
+            if not connected:
+                logger.error("Failed to connect to database after multiple retries. API may be degraded.")
+            else:
+                await create_tables()
+                logger.info("Database schema verified / created.")
+        except Exception as exc:
+            logger.error("Error during database initialization: %s", exc)
+
+    asyncio.create_task(init_db())
 
 
     # ── Load ML model into memory ─────────────────────────────────────────────
@@ -112,7 +116,6 @@ async def lifespan(app: FastAPI):
 
     # ── Background Workers ───────────────────────────────────────────────────
     try:
-        import asyncio
         from app.services.precompute_worker import precompute_analytics_loop
         asyncio.create_task(precompute_analytics_loop())
         logger.info("Precompute Analytics Worker started in background.")
@@ -171,28 +174,7 @@ app.add_middleware(GlobalExceptionMiddleware)
 app.add_middleware(RequestLoggingMiddleware)
 
 # ── Health Check & Root ───────────────────────────────────────────────────────
-@app.get("/", tags=["System"])
-async def root():
-    """Root endpoint for health checks and API identification."""
-    return {
-        "status": "online",
-        "service": "SmartInbox API",
-        "version": settings.APP_VERSION,
-        "docs": "/docs"
-    }
-
-@app.get("/health", tags=["System"])
-async def health_check():
-    """Detailed health check for load balancers."""
-    from app.services.ml_service import get_ml_error, init_spam_detector
-    detector = init_spam_detector()
-    return {
-        "status": "healthy" if detector._loaded else "degraded",
-        "ml_loaded": detector._loaded,
-        "ml_version": detector._model_version,
-        "ml_error": get_ml_error(),
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
+# Routes are now handled by duplicate removal below
 
 # ── CORS (Must be outermost layer so it adds headers even to 500 errors) ──────
 app.add_middleware(
@@ -315,5 +297,3 @@ async def redirect_to_frontend(path: str):
         return JSONResponse(status_code=404, content={"detail": "Not Found"})
     
     return RedirectResponse(url=f"{frontend_url}/{path}")
-
-from fastapi.responses import RedirectResponse

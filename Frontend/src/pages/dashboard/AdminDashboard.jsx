@@ -21,35 +21,25 @@ import { toast } from "react-hot-toast";
 import { D3LineChart, D3BarChart, D3DonutChart } from "../../components/charts/D3Charts";
 import { DashboardSkeleton } from "../../components/ui/SkeletonLoaders";
 
-// ── Optimized Sub-components ──────────────────────────────────────────────────
-
 const StatCard = memo(({ label, value, icon: Icon, color }) => (
-  <motion.div
-    whileHover={{ y: -2 }}
-    className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm relative overflow-hidden"
-  >
-    <div className="flex justify-between items-start mb-4 relative z-10">
-      <div className={`p-2.5 rounded-xl bg-${color}-50 text-${color}-600 border border-${color}-100`}>
+  <div className="bg-white border border-zinc-200 p-5 rounded-2xl relative overflow-hidden transition-all hover:border-zinc-300">
+    <div className="flex justify-between items-start mb-3">
+      <div className={`p-2 rounded-lg bg-zinc-50 text-zinc-900 border border-zinc-100`}>
         <Icon size={18} />
       </div>
     </div>
-    <div className="relative z-10">
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
-      <h3 className="text-3xl font-black text-slate-900 mt-1 tracking-tight">{value}</h3>
-    </div>
-    <div className={`absolute -bottom-4 -right-4 text-${color}-50 opacity-10`}>
-      <Icon size={100} />
-    </div>
-  </motion.div>
+    <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
+    <h3 className="text-2xl font-bold text-zinc-900 mt-1">{value}</h3>
+  </div>
 ));
 
 const TabButton = memo(({ active, onClick, icon: Icon, label }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-3 px-6 py-2.5 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all ${
+    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${
       active 
-        ? "bg-slate-900 text-white shadow-lg shadow-slate-200" 
-        : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+        ? "bg-zinc-900 text-white shadow-sm" 
+        : "text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50"
     }`}
   >
     <Icon size={14} />
@@ -112,46 +102,41 @@ export const AdminDashboard = () => {
   const mutation = useMutation({
     mutationFn: updateThreshold,
     onSuccess: () => {
-      toast.success("Neural boundary synchronized.");
+      toast.success("Synchronized.");
       queryClient.invalidateQueries({ queryKey: ["modelInfo"] });
     },
     onError: () => {
-      toast.error("Synchronization failed.");
+      toast.error("Failed.");
     }
   });
 
   if (modelLoading || statsLoading || analyticsLoading) return <DashboardSkeleton />;
 
   const handleUpdateThreshold = () => {
-    mutation.mutate(threshold);
+    mutation.mutate({ threshold });
   };
 
   const isUpdating = mutation.isLoading;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
-            <Server size={12} /> Live smartinbox Online
-          </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Control Center</h1>
-          <p className="text-sm text-slate-500 font-medium">Enterprise oversight and neural engine management.</p>
+    <div className="max-w-6xl mx-auto space-y-6 animate-in pb-12">
+      <div className="flex justify-between items-center bg-white p-8 rounded-2xl border border-zinc-200">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-zinc-900">Control Center</h1>
+          <p className="text-sm text-zinc-400 font-medium">Model Management & Oversight</p>
         </div>
 
-        <div className="flex gap-2 p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm">
+        <div className="flex gap-2 p-1 bg-zinc-50 border border-zinc-100 rounded-xl">
           <TabButton active={tab === "model"} onClick={() => setTab("model")} icon={Cpu} label="Engine" />
           <TabButton active={tab === "analytics"} onClick={() => setTab("analytics")} icon={Activity} label="Traffic" />
         </div>
       </div>
 
-      {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatCard label="Total Nodes" value={quickStats?.total_users || 0} icon={Users} color="indigo" />
-        <StatCard label="Inference Volume" value={quickStats?.total_messages || 0} icon={Activity} color="blue" />
-        <StatCard label="Threats Neutralized" value={quickStats?.spam_count || 0} icon={ShieldCheck} color="rose" />
-        <StatCard label="Neutral Rate" value={`${quickStats?.spam_rate || 0}%`} icon={TrendingUp} color="emerald" />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard label="Users" value={quickStats?.total_users || 0} icon={Users} />
+        <StatCard label="Inferences" value={quickStats?.total_messages || 0} icon={Activity} />
+        <StatCard label="Spam" value={quickStats?.spam_count || 0} icon={ShieldCheck} />
+        <StatCard label="Rate" value={`${quickStats?.spam_rate || 0}%`} icon={TrendingUp} />
       </div>
 
       <AnimatePresence mode="wait">
@@ -160,75 +145,59 @@ export const AdminDashboard = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          transition={{ duration: 0.15 }}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
         >
           {tab === "model" ? (
             <>
-              {/* Configuration Panel */}
-              <div className="lg:col-span-1 bg-white border border-slate-200 p-8 rounded-3xl shadow-sm space-y-8">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-bold flex items-center gap-2">
-                    <Settings size={18} className="text-indigo-600" />
-                    Engine Config
-                  </h3>
-                  <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Active Model: {modelInfo?.model_version}</p>
+              <div className="lg:col-span-1 bg-white border border-zinc-200 p-6 rounded-2xl space-y-8">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold uppercase tracking-wider">Configuration</h3>
+                  <p className="text-[10px] text-zinc-400 font-bold uppercase">v{modelInfo?.model_version}</p>
                 </div>
 
-                <div className="space-y-6 pt-6 border-t border-slate-100">
+                <div className="space-y-6 pt-6 border-t border-zinc-100">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">Boundary Threshold</span>
-                    <span className="text-lg font-black text-indigo-600 font-mono">{threshold.toFixed(3)}</span>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Threshold</span>
+                    <span className="text-xl font-bold text-zinc-900 font-mono">{threshold.toFixed(2)}</span>
                   </div>
                   <input 
                     type="range" min="0.1" max="0.9" step="0.01" 
                     value={threshold} 
                     onChange={(e) => setThreshold(parseFloat(e.target.value))}
-                    className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                    className="w-full h-1 bg-zinc-100 rounded-full appearance-none cursor-pointer accent-zinc-900 border border-zinc-100"
                   />
                   <button 
                     onClick={handleUpdateThreshold}
                     disabled={isUpdating}
-                    className="btn-premium w-full flex items-center justify-center gap-3 disabled:opacity-50"
+                    className="w-full h-12 bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-wider rounded-xl hover:bg-zinc-800 transition-all flex items-center justify-center gap-2"
                   >
-                    {isUpdating ? <RefreshCw className="animate-spin" size={16} /> : <ShieldCheck size={16} />}
-                    Sync Neural State
+                    {isUpdating ? <RefreshCw className="animate-spin" size={14} /> : <ShieldCheck size={14} />}
+                    Sync Engine
                   </button>
                 </div>
               </div>
 
-              {/* Feature Importance Chart */}
-              <div className="lg:col-span-2 bg-white border border-slate-200 p-8 rounded-3xl shadow-sm space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <TrendingUp size={18} className="text-indigo-600" />
-                  Feature Weightings
-                </h3>
+              <div className="lg:col-span-2 bg-white border border-zinc-200 p-6 rounded-2xl space-y-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider">Neural Weights</h3>
                 <div className="h-64">
-                  <D3BarChart data={importance} width={700} height={250} />
+                  <D3BarChart data={importance} width={650} height={250} />
                 </div>
               </div>
             </>
           ) : (
             <>
-              {/* Traffic Chart */}
-              <div className="lg:col-span-2 bg-white border border-slate-200 p-8 rounded-3xl shadow-sm space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <Network size={18} className="text-indigo-600" />
-                  Traffic Throughput
-                </h3>
+              <div className="lg:col-span-2 bg-white border border-zinc-200 p-6 rounded-2xl space-y-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider">Throughput</h3>
                 <div className="h-80">
-                  <D3LineChart data={trafficData} width={700} height={300} />
+                  <D3LineChart data={trafficData} width={650} height={300} />
                 </div>
               </div>
 
-              {/* Distribution Chart */}
-              <div className="lg:col-span-1 bg-white border border-slate-200 p-8 rounded-3xl shadow-sm space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <Users size={18} className="text-indigo-600" />
-                  Node Distribution
-                </h3>
-                <div className="h-80">
-                  <D3DonutChart data={userDist} size={250} />
+              <div className="lg:col-span-1 bg-white border border-zinc-200 p-6 rounded-2xl space-y-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider">Distribution</h3>
+                <div className="h-80 flex items-center justify-center">
+                  <D3DonutChart data={userDist} size={240} />
                 </div>
               </div>
             </>
@@ -239,3 +208,4 @@ export const AdminDashboard = () => {
   );
 };
 
+export default AdminDashboard;

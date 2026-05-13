@@ -34,18 +34,22 @@ const LAYER_CARDS = [
 
 const LayerCard = memo(({ icon: Icon, title, desc, color, layer }) => (
   <motion.div
-    whileHover={{ y: -2, scale: 1.01 }}
-    transition={{ duration: 0.2 }}
-    className={`bg-white p-5 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden`}
+    whileHover={{ y: -5, scale: 1.02 }}
+    transition={{ duration: 0.3, ease: "easeOut" }}
+    className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/20 relative overflow-hidden group"
   >
-    <div className={`absolute top-3 right-3 text-[10px] font-black text-${color}-200 tracking-widest`}>
-      L{layer}
+    <div className={`absolute -top-1 -right-1 w-16 h-16 bg-${color}-50/50 rounded-bl-[2rem] flex items-center justify-center`}>
+      <span className={`text-[10px] font-black text-${color}-400 uppercase tracking-widest`}>
+        L{layer}
+      </span>
     </div>
-    <div className={`p-2.5 rounded-xl bg-${color}-50 text-${color}-600 border border-${color}-100 w-fit mb-3`}>
-      <Icon size={15} />
+    
+    <div className={`w-14 h-14 rounded-2xl bg-${color}-50 text-${color}-600 border border-${color}-100 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-inner`}>
+      <Icon size={24} />
     </div>
-    <h4 className="text-sm font-bold text-slate-900 mb-1">{title}</h4>
-    <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{desc}</p>
+    
+    <h4 className="text-base font-black text-slate-900 mb-2 tracking-tight group-hover:text-indigo-600 transition-colors">{title}</h4>
+    <p className="text-xs text-slate-500 leading-relaxed font-medium">{desc}</p>
   </motion.div>
 ));
 
@@ -188,3 +192,5 @@ export const ScanPage = () => {
     </div>
   );
 };
+
+export default ScanPage;

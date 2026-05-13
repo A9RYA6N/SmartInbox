@@ -106,9 +106,21 @@ class SpamDetectorService:
     def _load(self) -> None:
         tag = self._model_version
 
-        ensemble_path  = _ARTIFACTS_DIR / f"ensemble_{tag}.pkl"
-        model_path     = _ARTIFACTS_DIR / f"model_{tag}.pkl"
-        pipeline_path  = _ARTIFACTS_DIR / "feature_pipeline.pkl"
+        # Look for ensemble/model in artifacts first, then models directory
+        ensemble_path = _ARTIFACTS_DIR / f"ensemble_{tag}.pkl"
+        if not ensemble_path.exists():
+            ensemble_path = _MODELS_DIR / f"ensemble_{tag}.pkl"
+
+        model_path = _ARTIFACTS_DIR / f"model_{tag}.pkl"
+        if not model_path.exists():
+            model_path = _MODELS_DIR / f"model_{tag}.pkl"
+
+        pipeline_path = _ARTIFACTS_DIR / f"feature_pipeline_{tag}.pkl"
+        if not pipeline_path.exists():
+            pipeline_path = _ARTIFACTS_DIR / "feature_pipeline.pkl"
+        if not pipeline_path.exists():
+             pipeline_path = _MODELS_DIR / f"feature_pipeline_{tag}.pkl"
+
         metadata_path  = _ARTIFACTS_DIR / f"metadata_{tag}.json"
         threshold_path = _ARTIFACTS_DIR / f"threshold_optimiser_{tag}.pkl"
 
@@ -584,8 +596,10 @@ class SpamDetectorService:
         if importances is None or not self._feature_names:
             return []
         idx = np.argsort(importances)[::-1][:top_n]
-        return [{"feature": self._feature_names[i], "importance": round(float(importances[i]), 6)}
-                for i in idx if i < len(self._feature_names)]
+        return [
+            {"rank": i + 1, "feature": self._feature_names[idx[i]], "importance": round(float(importances[idx[i]]), 6)}
+            for i in range(len(idx)) if idx[i] < len(self._feature_names)
+        ]
 
     def health(self) -> Dict[str, Any]:
         return {

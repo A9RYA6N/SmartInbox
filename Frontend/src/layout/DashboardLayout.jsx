@@ -1,34 +1,20 @@
-import React, { useState, memo } from "react";
+import React, { memo } from "react";
 import { Sidebar } from "./Sidebar";
 import { NotificationBell } from "../components/ui/NotificationBell";
-import { CommandPalette } from "../components/ui/CommandPalette";
 import { Outlet, useLocation } from "react-router-dom";
-import { Command } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const DashboardLayout = memo(() => {
-  const [isCommandOpen, setIsCommandOpen] = useState(false);
   const location = useLocation();
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden relative">
-      <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
-
+    <div className="flex h-screen bg-zinc-50 text-zinc-900 overflow-hidden relative">
       <Sidebar />
 
-      <main className="flex-1 relative overflow-y-auto overflow-x-hidden no-scrollbar">
+      <main className="flex-1 relative overflow-y-auto no-scrollbar">
         {/* Minimal Header */}
-        <div className="sticky top-0 z-40 px-8 py-4 bg-white/80 backdrop-blur-md border-b border-slate-200 flex justify-end">
-          <div className="flex items-center gap-4">
-            <NotificationBell />
-            <button
-              onClick={() => setIsCommandOpen(true)}
-              className="flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-xl border border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-100 transition-all group"
-            >
-              <Command size={14} className="group-hover:text-indigo-600 transition-colors" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Command</span>
-            </button>
-          </div>
+        <div className="sticky top-0 z-40 px-8 py-3 bg-white/50 backdrop-blur-sm border-b border-zinc-100 flex justify-end items-center">
+          <NotificationBell />
         </div>
 
         <div className="relative z-10 p-8 min-h-[calc(100vh-80px)]">

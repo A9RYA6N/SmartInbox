@@ -622,3 +622,5 @@ export const AdminUsersPage = () => {
     </div>
   );
 };
+
+export default AdminUsersPage;

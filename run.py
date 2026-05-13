@@ -76,3 +76,9 @@ from Backend import main as _main  # noqa: E402
 
 # `app` is what uvicorn reads: `uvicorn run:app`
 app = _main.app
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("run:app", host="0.0.0.0", port=port, reload=True)

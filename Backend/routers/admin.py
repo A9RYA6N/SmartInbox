@@ -32,7 +32,7 @@ from datetime import datetime, timezone
 from typing import Annotated, Any, Dict, List, Optional
 
 import pandas as pd
-from fastapi import APIRouter, File, Form, HTTPException, Query, Request, UploadFile, status
+from fastapi import APIRouter, Body, File, Form, HTTPException, Query, Request, UploadFile, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import Integer, case, func, select, update
 
@@ -376,7 +376,7 @@ async def update_threshold(
     admin:   AdminUser,
     db:      DBSession,
     ml:      MLService,
-    req:     UpdateThresholdRequest,
+    req:     Annotated[UpdateThresholdRequest, Body(...)],
     request: Request,
 ) -> UpdateThresholdResponse:
     """Change the spam/ham threshold live — no model reload required."""

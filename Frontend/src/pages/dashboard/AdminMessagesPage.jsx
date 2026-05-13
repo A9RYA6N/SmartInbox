@@ -262,3 +262,5 @@ export const AdminMessagesPage = () => {
     </div>
   );
 };
+
+export default AdminMessagesPage;
